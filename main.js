@@ -15,7 +15,7 @@
     }
 
     const img = document.createElement('img');
-    img.src = p.imagen;
+    img.src = p.imagen || 'img/projects/placeholder.svg';
     img.alt = p.nombre;
 
     const label = document.createElement('p');
