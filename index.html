@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeoLand 🚀</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+
+<!-- Floating decorative elements -->
+<div class="floating-rocket floating-rocket-right" aria-hidden="true">
+  <img src="img/rocket-deco.png" alt="" width="60" height="90" />
+</div>
+<div class="floating-rocket floating-rocket-left" aria-hidden="true">
+  <img src="img/rocket-deco.png" alt="" width="50" height="75" />
+</div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-decor">
+      <!-- <img src="img/rocketv2.png" alt="" class="header-rocket" width="165" height="128" /> -->
+      <!-- <img src="img/rocketv3.png" alt="" class="header-rocket" width="133" height="103" /> -->
+      <img src="img/rocketv4.png" alt="" class="header-rocket" width="105" height="81" />
+      <h1 class="site-title">LEOLAND</h1>
+      <div class="header-planets">
+        <img src="img/planet-saturnv4.gif" alt="" width="130" height="81" />
+      </div>
+    </div>
+
+    <!-- <nav class="nav">
+      <a href="#inicio" class="active">Inicio</a>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#juegos">Juegos</a>
+    </nav> -->
+  </header>
+
+  <!-- ¿QUIÉN SOY YO? -->
+  <section id="inicio" class="section-box">
+    <span class="corner-plus corner-plus--tl" aria-hidden="true">+</span>
+    <span class="corner-plus corner-plus--tr" aria-hidden="true">+</span>
+    <span class="corner-plus corner-plus--bl" aria-hidden="true">+</span>
+    <span class="corner-plus corner-plus--br" aria-hidden="true">+</span>
+    <span class="edge-plus edge-plus--top" aria-hidden="true">+</span>
+    <span class="edge-plus edge-plus--bottom" aria-hidden="true">+</span>
+    <span class="edge-plus edge-plus--left" aria-hidden="true">+</span>
+    <span class="edge-plus edge-plus--right" aria-hidden="true">+</span>
+    <!-- <h2 class="section-title">¿Quién soy yo?</h2> -->
+    <h2 class="section-title">¡Bienvenido a LeoLand!</h2>
+    <div class="about-content">
+      <div class="about-avatar">
+        <!-- <img src="img/avatarv2.png" alt="Leo" width="120" height="160" /> -->
+        <!-- <img src="img/avatarv3.png" alt="Leo" width="120" height="160" />
+        <img src="img/avatarv4.png" alt="Leo" width="136" height="134" /> -->
+        <img src="img/avatarv5.png" alt="Leo" width="111" height="110" />
+      </div>
+      <!-- <div class="about-bubble">
+        ¡Hola! Soy Leo.<br />
+        Me gusta la programación,<br />
+        los videojuegos y explorar el espacio.<br />
+        ¡Vamos a jugar juntos!
+      </div> -->
+      <div class="about-bubble">
+        ¡Hola! Soy Leo.<br />
+        Me gusta la programación,<br />
+        los videojuegos y explorar el espacio.<br />
+        ¡Vamos a jugar juntos!
+      </div>
+    </div>
+  </section>
+
+  <!-- MIS PROYECTOS -->
+  <section id="proyectos" class="section-box">
+    <span class="corner-plus corner-plus--tl" aria-hidden="true">+</span>
+    <span class="corner-plus corner-plus--tr" aria-hidden="true">+</span>
+    <span class="corner-plus corner-plus--bl" aria-hidden="true">+</span>
+    <span class="corner-plus corner-plus--br" aria-hidden="true">+</span>
+    <span class="edge-plus edge-plus--top" aria-hidden="true">+</span>
+    <span class="edge-plus edge-plus--bottom" aria-hidden="true">+</span>
+    <span class="edge-plus edge-plus--left" aria-hidden="true">+</span>
+    <span class="edge-plus edge-plus--right" aria-hidden="true">+</span>
+    <h2 class="section-title">Mis Proyectos</h2>
+    <div class="projects-grid" id="projects-grid"></div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="moon-surface">
+    <img src="img/moon-footer.gif" alt="" class="moon-img" />
+  </div>
+  <p>&copy; 2026 LeoLand &mdash; Hecho con 💜 por Leo</p>
+</footer>
+
+<script src="projects.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>
