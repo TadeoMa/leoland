@@ -1,0 +1,348 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%);
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+/* Estrellas de fondo */
+.stars-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.stars-bg::before,
+.stars-bg::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, white, transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, white, transparent),
+        radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1px 1px at 230px 80px, white, transparent),
+        radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 400px 60px, white, transparent),
+        radial-gradient(2px 2px at 500px 200px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 600px 100px, white, transparent),
+        radial-gradient(2px 2px at 700px 180px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1px 1px at 800px 50px, white, transparent),
+        radial-gradient(2px 2px at 900px 220px, rgba(255,255,255,0.7), transparent);
+    background-repeat: repeat;
+    background-size: 1000px 300px;
+    animation: twinkle 4s ease-in-out infinite;
+}
+
+.stars-bg::after {
+    background-size: 800px 400px;
+    animation: twinkle 6s ease-in-out infinite reverse;
+    opacity: 0.7;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Título */
+.title {
+    font-size: 4rem;
+    color: #fff;
+    text-shadow: 
+        0 0 10px #ff69b4,
+        0 0 20px #ff69b4,
+        0 0 30px #ff69b4,
+        0 0 40px #ff1493;
+    letter-spacing: 0.3em;
+    margin-bottom: 10px;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.star {
+    color: #ffd700;
+    text-shadow: 
+        0 0 10px #ffd700,
+        0 0 20px #ffa500;
+    animation: spin 3s linear infinite;
+    display: inline-block;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 
+            0 0 10px #ff69b4,
+            0 0 20px #ff69b4,
+            0 0 30px #ff69b4;
+    }
+    to {
+        text-shadow: 
+            0 0 20px #ff69b4,
+            0 0 30px #ff69b4,
+            0 0 40px #ff69b4,
+            0 0 50px #ff1493;
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.subtitle {
+    color: #aaa;
+    font-size: 1.2rem;
+    margin-bottom: 50px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Planetas */
+.planets-wrapper {
+    display: flex;
+    gap: 80px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.planet-container {
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.planet {
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.planet:hover {
+    transform: scale(1.1);
+}
+
+
+
+.planet-body {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    position: relative;
+    animation: float 3s ease-in-out infinite;
+    overflow: visible;
+}
+
+/* Planeta morado - Guerra Espacial */
+.planet-purple {
+    background: linear-gradient(145deg, #9b59b6 0%, #8e44ad 30%, #6c3483 70%, #4a235a 100%);
+    box-shadow: 
+        0 0 20px #9b59b6,
+        0 0 40px rgba(155, 89, 182, 0.5),
+        inset -30px -30px 60px rgba(0,0,0,0.4),
+        inset 10px 10px 20px rgba(255,255,255,0.1);
+}
+
+.planet:hover .planet-purple {
+    box-shadow: 
+        0 0 40px #9b59b6,
+        0 0 80px #8e44ad,
+        inset -30px -30px 60px rgba(0,0,0,0.4);
+}
+
+/* Planeta verde - Escapa del Monstruo */
+.planet-green {
+    background: linear-gradient(145deg, #27ae60 0%, #1e8449 30%, #145a32 70%, #0b3d1e 100%);
+    box-shadow: 
+        0 0 20px #27ae60,
+        0 0 40px rgba(39, 174, 96, 0.5),
+        inset -30px -30px 60px rgba(0,0,0,0.4),
+        inset 10px 10px 20px rgba(255,255,255,0.1);
+    animation: float 3s ease-in-out infinite 0.5s;
+}
+
+.planet:hover .planet-green {
+    box-shadow: 
+        0 0 40px #27ae60,
+        0 0 80px #1e8449,
+        inset -30px -30px 60px rgba(0,0,0,0.4);
+}
+
+/* Detalles del planeta verde */
+.surface-line {
+    position: absolute;
+    background: rgba(30, 132, 73, 0.6);
+    border-radius: 50%;
+}
+
+.line1 {
+    width: 80px;
+    height: 15px;
+    top: 60px;
+    left: 30px;
+    transform: rotate(-10deg);
+}
+
+.line2 {
+    width: 60px;
+    height: 12px;
+    bottom: 70px;
+    right: 40px;
+    transform: rotate(15deg);
+}
+
+.monster-eye {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, #ff0000 30%, #8b0000 70%);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 
+        0 0 15px rgba(255, 0, 0, 0.8),
+        inset 0 0 10px rgba(0, 0, 0, 0.5);
+    animation: blink 4s ease-in-out infinite;
+}
+
+.monster-eye::after {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 20px;
+    background: #000;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes blink {
+    0%, 90%, 100% { transform: translate(-50%, -50%) scaleY(1); }
+    95% { transform: translate(-50%, -50%) scaleY(0.1); }
+}
+
+/* Etiqueta del planeta */
+.planet-label {
+    color: #fff;
+    font-size: 1.1rem;
+    margin-top: 20px;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    font-weight: bold;
+    letter-spacing: 0.1em;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+
+/* Anillo del planeta */
+.ring {
+    position: absolute;
+    width: 280px;
+    height: 60px;
+    border: 8px solid rgba(255, 215, 0, 0.6);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotateX(70deg);
+    box-shadow: 
+        0 0 10px rgba(255, 215, 0, 0.5),
+        inset 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Cráteres del planeta */
+.crater {
+    position: absolute;
+    background: rgba(74, 35, 90, 0.6);
+    border-radius: 50%;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.crater1 {
+    width: 30px;
+    height: 30px;
+    top: 40px;
+    left: 50px;
+}
+
+.crater2 {
+    width: 20px;
+    height: 20px;
+    top: 80px;
+    right: 40px;
+}
+
+.crater3 {
+    width: 25px;
+    height: 25px;
+    bottom: 50px;
+    left: 80px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .title {
+        font-size: 2.5rem;
+        letter-spacing: 0.1em;
+    }
+
+    .planets-wrapper {
+        gap: 50px;
+    }
+    
+    .planet-body {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .ring {
+        width: 210px;
+        height: 45px;
+    }
+
+    .planet-label {
+        font-size: 0.9rem;
+    }
+
+    .monster-eye {
+        width: 30px;
+        height: 30px;
+    }
+
+    .monster-eye::after {
+        width: 12px;
+        height: 15px;
+    }
+}
