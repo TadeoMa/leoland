@@ -16,6 +16,13 @@
             font-family: 'Press Start 2P', 'Courier New', monospace;
             overflow: hidden;
         }
+        #hudRow {
+            width: 900px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
         #hud {
             color: #fff;
             width: 800px;
@@ -24,6 +31,20 @@
             padding: 8px 16px;
             font-size: 14px;
             background: #000;
+        }
+        #debugAddLifeBtn {
+            display: none;
+            padding: 8px 10px;
+            border: 2px solid #2E7D32;
+            background: #1B5E20;
+            color: #fff;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        #debugAddLifeBtn:hover {
+            background: #2E7D32;
         }
         canvas {
             border: 2px solid #333;
@@ -132,11 +153,14 @@
     </style>
 </head>
 <body>
-    <div id="hud">
-        <span>DINO</span>
-        <span id="scoreDisplay">Monedas: 0</span>
-        <span id="livesDisplay">Vidas: 3</span>
-        <span id="levelDisplay">Mundo 1-1</span>
+    <div id="hudRow">
+        <div id="hud">
+            <span>DINO</span>
+            <span id="scoreDisplay">🪙 Monedas: 0</span>
+            <span id="livesDisplay">❤️ Vidas: 3</span>
+            <span id="levelDisplay">🌍 Mundo 1-1</span>
+        </div>
+        <button id="debugAddLifeBtn" type="button">+1 ❤️</button>
     </div>
     <canvas id="gameCanvas" width="800" height="480"></canvas>
 
@@ -158,17 +182,25 @@
     <div id="gameOverScreen" style="display:none;">
         <h1>GAME OVER</h1>
         <p id="finalScore"></p>
-        <button class="start-btn" onclick="startGame()">REINTENTAR</button>
-        <button class="start-btn" style="margin-left:10px;background:#555" onclick="goToLevelSelect()">ELEGIR NIVEL</button>
+        <button class="start-btn" onclick="retryLevel()">REINTENTAR (espacio)</button>
+        <button class="start-btn" style="margin-left:10px;background:#555" onclick="goToLevelSelect()">ELEGIR NIVEL (intro)</button>
     </div>
 
     <div id="winScreen" style="display:none;">
         <h1>🎉 ¡GANASTE! 🎉</h1>
         <p id="winScore"></p>
-        <button class="start-btn" onclick="goToLevelSelect()">ELEGIR NIVEL</button>
-        <button class="start-btn" style="margin-left:10px;background:#4CAF50" onclick="startGame()">JUGAR DE NUEVO</button>
+        <button class="start-btn" onclick="goToLevelSelect()">ELEGIR NIVEL (intro)</button>
+        <button class="start-btn" style="margin-left:10px;background:#4CAF50" onclick="retryLevel()">JUGAR DE NUEVO (espacio)</button>
     </div>
 
-    <script src="game.js"></script>
+    <!-- Módulos del juego (orden de importación importante) -->
+    <script src="js/config.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/physics.js"></script>
+    <script src="js/entities.js"></script>
+    <script src="js/rendering.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/game.js"></script>
 </body>
 </html>
