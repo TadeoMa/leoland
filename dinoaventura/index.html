@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dino Adventure - Plataformas 2D</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            overflow: hidden;
+        }
+        #hud {
+            color: #fff;
+            width: 800px;
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            font-size: 14px;
+            background: #000;
+        }
+        canvas {
+            border: 2px solid #333;
+            display: block;
+            image-rendering: pixelated;
+        }
+        #startScreen, #gameOverScreen, #winScreen, #levelSelectScreen {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            text-align: center;
+            z-index: 10;
+        }
+        #startScreen h1 { font-size: 32px; color: #4CAF50; margin-bottom: 20px; }
+        #startScreen p { font-size: 14px; margin: 8px 0; }
+        #startScreen .start-btn {
+            margin-top: 24px; padding: 12px 32px;
+            font-size: 16px; background: #4CAF50; color: #fff;
+            border: none; cursor: pointer; font-family: inherit;
+        }
+        #startScreen .start-btn:hover { background: #66BB6A; }
+        #gameOverScreen h1 { font-size: 28px; color: #f44336; margin-bottom: 16px; }
+        #gameOverScreen .start-btn { margin-top: 16px; padding: 10px 28px; font-size: 14px; background: #f44336; color: #fff; border: none; cursor: pointer; font-family: inherit; }
+        #winScreen h1 { font-size: 28px; color: #FFD700; margin-bottom: 16px; }
+        #winScreen .start-btn { margin-top: 16px; padding: 10px 28px; font-size: 14px; background: #FFD700; color: #000; border: none; cursor: pointer; font-family: inherit; }
+        .controls { font-size: 11px; color: #aaa; margin-top: 8px; }
+
+        /* Level Select */
+        #levelSelectScreen {
+            display: none;
+            width: 740px;
+        }
+        #levelSelectScreen h2 {
+            font-size: 22px;
+            color: #FFD700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        #levelGrid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin: 10px auto;
+        }
+        .level-btn {
+            padding: 14px 8px;
+            border: 3px solid #444;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .level-btn.unlocked {
+            background: linear-gradient(135deg, #1B5E20, #388E3C);
+            border-color: #4CAF50;
+            color: #fff;
+        }
+        .level-btn.unlocked:hover {
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+        .level-btn.current {
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        .level-btn.locked {
+            background: #333;
+            border-color: #555;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .lvl-num {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .lvl-name {
+            font-size: 8px;
+            opacity: 0.8;
+        }
+        .lock-icon {
+            font-size: 14px;
+            position: absolute;
+            top: 4px;
+            right: 6px;
+        }
+        #levelSelectBack {
+            margin-top: 16px;
+            padding: 8px 20px;
+            font-size: 12px;
+            background: #555;
+            color: #fff;
+            border: 2px solid #888;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        #levelSelectBack:hover { background: #777; }
+    </style>
+</head>
+<body>
+    <div id="hud">
+        <span>DINO</span>
+        <span id="scoreDisplay">Monedas: 0</span>
+        <span id="livesDisplay">Vidas: 3</span>
+        <span id="levelDisplay">Mundo 1-1</span>
+    </div>
+    <canvas id="gameCanvas" width="800" height="480"></canvas>
+
+    <div id="startScreen">
+        <h1>🦖 DINO AVENTURA</h1>
+        <p>¡Ayuda a Dino a recorrer el mundo!</p>
+        <p>Recoge monedas, esquiva enemigos y llega a la meta</p>
+        <br>
+        <p class="controls">⬅️➡️ Mover | ⬆️ Saltar | ESPACIO Lengua (comer enemigo)</p>
+        <button class="start-btn" onclick="startGame()">JUGAR</button>
+    </div>
+
+    <div id="levelSelectScreen" style="display:none;">
+        <h2>🗺️ ELIGE UN NIVEL</h2>
+        <div id="levelGrid"></div>
+        <button id="levelSelectBack" onclick="backToMenu()">VOLVER AL MENÚ</button>
+    </div>
+
+    <div id="gameOverScreen" style="display:none;">
+        <h1>GAME OVER</h1>
+        <p id="finalScore"></p>
+        <button class="start-btn" onclick="startGame()">REINTENTAR</button>
+        <button class="start-btn" style="margin-left:10px;background:#555" onclick="goToLevelSelect()">ELEGIR NIVEL</button>
+    </div>
+
+    <div id="winScreen" style="display:none;">
+        <h1>🎉 ¡GANASTE! 🎉</h1>
+        <p id="winScore"></p>
+        <button class="start-btn" onclick="goToLevelSelect()">ELEGIR NIVEL</button>
+        <button class="start-btn" style="margin-left:10px;background:#4CAF50" onclick="startGame()">JUGAR DE NUEVO</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
