@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Cat - Escapa del Monstruo</title>
+    <link rel="stylesheet" href="escape-monster.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <a href="../index.html" class="back-btn">← Volver</a>
+            <h1>ESCAPA DEL MONSTRUO</h1>
+            <div class="score-board">
+                <span>TARTAS: <span id="score">0</span></span>
+                <span>VIDAS: <span id="lives">3</span></span>
+                <span>TIEMPO: <span id="timer">60</span>s</span>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="startScreen" class="overlay">
+            <h2>🎂 ESCAPA DEL MONSTRUO 🎂</h2>
+            <p>Usa ← ↑ → ↓ para mover al gato</p>
+            <p>¡Recoge tartas y escapa del monstruo!</p>
+            <p>Tienes 60 segundos y 3 vidas</p>
+            <button id="startBtn">JUGAR</button>
+        </div>
+        
+        <div id="gameOverScreen" class="overlay hidden">
+            <h2>GAME OVER</h2>
+            <p>El monstruo te atrapó</p>
+            <p>Tartas recogidas: <span id="finalScore">0</span></p>
+            <button id="restartBtn">REINTENTAR</button>
+        </div>
+        
+        <div id="winScreen" class="overlay hidden">
+            <h2>¡SOBREVIVISTE!</h2>
+            <p>Tartas recogidas: <span id="winScore">0</span></p>
+            <button id="playAgainBtn">JUGAR DE NUEVO</button>
+        </div>
+    </div>
+
+    <script src="escape-monster.js"></script>
+</body>
+</html>

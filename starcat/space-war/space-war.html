@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Cat - Guerra Espacial</title>
+    <link rel="stylesheet" href="space-war.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <a href="../index.html" class="back-btn">← Volver</a>
+            <h1>STAR CAT INVADERS</h1>
+            <div class="score-board">
+                <span>PUNTOS: <span id="score">0</span></span>
+                <span>VIDAS: <span id="lives">3</span></span>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="startScreen" class="overlay">
+            <h2>★ STAR CAT INVADERS ★</h2>
+            <p>Usa ← → para mover</p>
+            <p>ESPACIO para disparar</p>
+            <button id="startBtn">JUGAR</button>
+        </div>
+        
+        <div id="gameOverScreen" class="overlay hidden">
+            <h2>GAME OVER</h2>
+            <p>Puntuación: <span id="finalScore">0</span></p>
+            <button id="restartBtn">REINTENTAR</button>
+        </div>
+        
+        <div id="winScreen" class="overlay hidden">
+            <h2>¡GANASTE!</h2>
+            <p>Puntuación: <span id="winScore">0</span></p>
+            <button id="nextLevelBtn">SIGUIENTE NIVEL</button>
+        </div>
+    </div>
+
+    <script src="space-war.js"></script>
+</body>
+</html>
