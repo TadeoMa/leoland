@@ -8,13 +8,13 @@ const projects = [
   {
     nombre: "Star Cat",
     imagen: "img/projects/starcat.gif",
-    enlace: "../starcat/index.html",
+    enlace: "starcat/index.html",
     enable: true
   },
   {
     nombre: "Dino Aventura",
     imagen: "img/projects/dinoaventura.gif",
-    enlace: "../dinoaventura/index.html",
+    enlace: "dinoaventura/index.html",
     enable: true
   },
   // {
