@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Minimine</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- UI Overlay -->
+        <div id="ui-overlay">
+            <!-- HUD -->
+            <div id="hud">
+                <div id="health-bar">
+                    <span class="bar-icon">❤️</span>
+                    <div id="health-fill"></div>
+                    <span id="health-text"></span>
+                </div>
+                <div id="shield-bar">
+                    <span class="bar-icon">🛡️</span>
+                    <div id="shield-fill"></div>
+                    <span id="shield-text"></span>
+                </div>
+                <div id="resources-display">
+                    <span id="valentia-display">⚔ 0</span>
+                    <span id="diamonds-display">💎 0</span>
+                    <span id="emeralds-display">🟢 0</span>
+                </div>
+                <div id="day-night-indicator"></div>
+                <div id="equipped-display"></div>
+            </div>
+
+            <!-- Hotbar -->
+            <div id="hotbar"></div>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div id="mobile-controls">
+            <div id="mobile-left">
+                <button class="mobile-btn" id="btn-left">◀</button>
+                <button class="mobile-btn" id="btn-right">▶</button>
+            </div>
+            <div id="mobile-right">
+                <button class="mobile-btn" id="btn-jump">▲</button>
+                <button class="mobile-btn" id="btn-down">▼</button>
+                <button class="mobile-btn" id="btn-attack">⚔</button>
+            </div>
+            <div id="mobile-menu-buttons">
+                <button class="mobile-btn small" id="btn-shop">🏪</button>
+                <button class="mobile-btn small" id="btn-inventory">🎒</button>
+            </div>
+        </div>
+
+        <!-- Inventory Panel -->
+        <div id="inventory-panel" class="panel hidden">
+            <div class="panel-header">
+                <h2>Inventario</h2>
+                <button class="close-btn" id="close-inventory">✕</button>
+            </div>
+            <div id="inventory-grid"></div>
+        </div>
+
+        <!-- Shop Panel -->
+        <div id="shop-panel" class="panel hidden">
+            <div class="panel-header">
+                <h2>Tienda</h2>
+                <button class="close-btn" id="close-shop">✕</button>
+            </div>
+            <div id="shop-tabs">
+                <button class="shop-tab active" data-tab="valentia">Valentía</button>
+                <button class="shop-tab" data-tab="diamonds">Diamantes</button>
+            </div>
+            <div id="shop-items"></div>
+        </div>
+
+        <!-- Pause Menu -->
+        <div id="pause-menu" class="panel hidden">
+            <h2>PAUSA</h2>
+            <button id="resume-btn">Continuar</button>
+            <button id="save-btn">Guardar</button>
+            <button id="quit-btn">Salir</button>
+        </div>
+
+        <!-- Death Screen -->
+        <div id="death-screen" class="panel hidden">
+            <h2>Has Muerto</h2>
+            <p id="death-message"></p>
+            <button id="respawn-btn">Respawn</button>
+        </div>
+
+        <!-- Portal/Boss Screen -->
+        <div id="portal-screen" class="panel hidden">
+            <h2>¡PORTAL ABIERTO!</h2>
+            <p>Has derrotado suficientes monstruos. Un portal dimensional se ha abierto.</p>
+            <button id="enter-portal-btn">Entrar al Portal</button>
+            <button id="ignore-portal-btn">Ignorar</button>
+        </div>
+
+        <!-- Villager Dialog -->
+        <div id="villager-dialog" class="panel hidden">
+            <div class="panel-header">
+                <h2>Aldeano</h2>
+                <button class="close-btn" id="close-villager">✕</button>
+            </div>
+            <p>¿Quieres intercambiar una esmeralda por un objeto aleatorio?</p>
+            <button id="trade-btn">Intercambiar (1 🟢)</button>
+            <p id="trade-result"></p>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <h1>MINIMINE</h1>
+            <p>Supervivencia · Minería · Exploración · Combate</p>
+            <button id="new-game-btn">Nueva Partida</button>
+            <button id="load-game-btn">Cargar Partida</button>
+            <div id="controls-info">
+                <p><strong>PC:</strong> A/D Mover · W Saltar · S Bajar · Click Atacar · E Tienda · I Inventario · ESC Pausa</p>
+                <p><strong>Móvil:</strong> Controles táctiles en pantalla</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts (modular) -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/sprites.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemies.js"></script>
+    <script src="js/combat.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/daynight.js"></script>
+    <script src="js/portal.js"></script>
+    <script src="js/save.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
