@@ -17,6 +17,18 @@ const projects = [
     enlace: "dinoaventura/index.html",
     enable: true
   },
+  {
+    nombre: "Snake Neón",
+    imagen: "img/projects/snake.gif",
+    enlace: "snake/index.html",
+    enable: true
+  },
+  {
+    nombre: "Minimine",
+    imagen: "img/projects/minimine.gif",
+    enlace: "minimine/index.html",
+    enable: true
+  },
   // {
   //   nombre: "Juego Espacial",
   //   imagen: "img/projects/space.gif",
