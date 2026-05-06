@@ -83,7 +83,10 @@ const UI = {
             const slot = document.createElement('div');
             slot.className = 'hotbar-slot';
             slot.innerHTML = `<span class="slot-key">${i + 1}</span>`;
-            slot.addEventListener('click', () => Inventory.selectSlot(i));
+            slot.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                Inventory.selectSlot(i);
+            });
             hotbar.appendChild(slot);
         }
     },
@@ -115,7 +118,7 @@ const UI = {
     _updateHotbar() {
         const slots = this.elements.hotbar.querySelectorAll('.hotbar-slot');
         for (let i = 0; i < slots.length; i++) {
-            const item = Inventory.slots[i];
+            const item = Inventory.getHotbarItem(i);
             const isActive = i === Inventory.selectedSlot;
             slots[i].className = 'hotbar-slot' + (isActive ? ' active' : '');
             

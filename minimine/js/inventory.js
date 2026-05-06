@@ -9,9 +9,21 @@ const Inventory = {
     maxSlots: 20,
     houseStorage: [],    // Items stored in house
 
+    _defaultHotbar() {
+        return [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    },
+
+    _normalizeHotbar() {
+        if (!Array.isArray(this.hotbar) || this.hotbar.length !== 9) {
+            this.hotbar = this._defaultHotbar();
+        }
+
+        this.selectedSlot = Utils.clamp(this.selectedSlot, 0, this.hotbar.length - 1);
+    },
+
     init() {
         this.slots = [];
-        this.hotbar = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        this.hotbar = this._defaultHotbar();
         this.selectedSlot = 0;
         this.houseStorage = [];
 
@@ -91,15 +103,18 @@ const Inventory = {
         return this.slots.some(s => s.id === id);
     },
 
+    getHotbarItem(index) {
+        const hotbarIndex = this.hotbar[index];
+        if (hotbarIndex === undefined) return null;
+        return this.slots[hotbarIndex] || null;
+    },
+
     getEquipped() {
-        const hotbarIndex = this.hotbar[this.selectedSlot];
-        if (hotbarIndex < this.slots.length) {
-            return this.slots[hotbarIndex];
-        }
-        return null;
+        return this.getHotbarItem(this.selectedSlot);
     },
 
     selectSlot(index) {
+        this._normalizeHotbar();
         this.selectedSlot = Utils.clamp(index, 0, this.hotbar.length - 1);
     },
 
@@ -131,6 +146,7 @@ const Inventory = {
     toSaveData() {
         return {
             slots: this.slots,
+            hotbar: this.hotbar,
             selectedSlot: this.selectedSlot,
             houseStorage: this.houseStorage,
         };
@@ -138,7 +154,9 @@ const Inventory = {
 
     fromSaveData(data) {
         this.slots = data.slots || [];
-        this.selectedSlot = data.selectedSlot || 0;
+        this.hotbar = Array.isArray(data.hotbar) && data.hotbar.length ? data.hotbar.slice(0, 9) : this._defaultHotbar();
+        this.selectedSlot = Number.isInteger(data.selectedSlot) ? data.selectedSlot : 0;
         this.houseStorage = data.houseStorage || [];
+        this._normalizeHotbar();
     },
 };
