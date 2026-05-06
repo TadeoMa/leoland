@@ -548,20 +548,22 @@ const Renderer = {
             const toolSprite = Sprites.get(equipped.id);
             const isAttacking = Input.isAttack();
             const swingAngle = isAttacking ? Math.sin(Date.now() * 0.02) * 0.6 : 0;
-            const toolX = p.facingRight ? p.x + p.width - 2 : p.x - 22;
-            const toolY = p.y + 8;
+            const toolSize = 48;
+            const halfToolSize = toolSize / 2;
+            const toolX = p.facingRight ? p.x + p.width - 10 : p.x - 30;
+            const toolY = p.y;
 
             this.ctx.save();
             if (toolSprite) {
-                this.ctx.translate(toolX + 12, toolY + 12);
+                this.ctx.translate(toolX + halfToolSize, toolY + halfToolSize);
                 this.ctx.rotate(swingAngle * (p.facingRight ? 1 : -1));
                 if (!p.facingRight) this.ctx.scale(-1, 1);
-                this.ctx.drawImage(toolSprite, -12, -12, 24, 24);
+                this.ctx.drawImage(toolSprite, -halfToolSize, -halfToolSize, toolSize, toolSize);
             } else {
-                this.ctx.translate(toolX + 10, toolY + 10);
+                this.ctx.translate(toolX + halfToolSize, toolY + halfToolSize);
                 this.ctx.rotate(swingAngle);
-                this.ctx.font = '18px serif';
-                this.ctx.fillText(equipped.icon, -8, 6);
+                this.ctx.font = '36px serif';
+                this.ctx.fillText(equipped.icon, -14, 12);
             }
             this.ctx.restore();
         }
