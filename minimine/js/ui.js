@@ -75,6 +75,12 @@ const UI = {
         if (!SaveSystem.hasSave()) {
             document.getElementById('load-game-btn').style.opacity = '0.5';
         }
+
+        // Show local indicator if in local environment
+        const localIndicator = document.getElementById('local-indicator');
+        if (CONFIG.IS_LOCAL) {
+            localIndicator.classList.remove('hidden');
+        }
     },
 
     _buildHotbar() {
