@@ -168,7 +168,7 @@ const CONFIG = {
     },
 
     // =====================
-    // RESOURCE VALUES (Valentía points)
+    // RESOURCE VALUES (Dinero points)
     // =====================
     RESOURCE_VALUES: {
         sand: 0,
@@ -193,7 +193,7 @@ const CONFIG = {
                 color: '#27AE60',
                 width: 24,
                 height: 38,
-                valentia: 5,
+                money: 5,
                 biome: 'any',
             },
             skeleton: {
@@ -204,7 +204,7 @@ const CONFIG = {
                 color: '#ECF0F1',
                 width: 22,
                 height: 38,
-                valentia: 8,
+                money: 8,
                 biome: 'any',
                 ranged: true,
             },
@@ -216,7 +216,7 @@ const CONFIG = {
                 color: '#D4AC0D',
                 width: 30,
                 height: 30,
-                valentia: 10,
+                money: 10,
                 biome: 'desert',
                 weakTo: 'shovel',
             },
@@ -228,7 +228,7 @@ const CONFIG = {
                 color: '#6C3483',
                 width: 28,
                 height: 18,
-                valentia: 7,
+                money: 7,
                 biome: 'caves',
             },
             mountain_golem: {
@@ -239,7 +239,7 @@ const CONFIG = {
                 color: '#5D6D7E',
                 width: 32,
                 height: 42,
-                valentia: 15,
+                money: 15,
                 biome: 'mountains',
             },
             boss: {
@@ -250,7 +250,7 @@ const CONFIG = {
                 color: '#8E44AD',
                 width: 48,
                 height: 56,
-                valentia: 100,
+                money: 100,
                 biome: 'portal',
                 isBoss: true,
             },
@@ -265,7 +265,7 @@ const CONFIG = {
     // SHOP
     // =====================
     SHOP: {
-        VALENTIA_ITEMS: [
+        MONEY_ITEMS: [
             { id: 'house', name: 'Casa', icon: '🏠', price: 50, description: 'Punto de respawn y almacén' },
             { id: 'health_potion', name: 'Poción de Vida', icon: '❤️', price: 15, description: '+3 vida' },
             { id: 'shield_potion', name: 'Poción de Escudo', icon: '🛡️', price: 20, description: '+3 escudo' },
@@ -318,7 +318,7 @@ const CONFIG = {
          * Change this value to adjust difficulty.
          */
         KILLS_TO_OPEN: 5,
-        BOSS_REWARD_VALENTIA: 200,
+        BOSS_REWARD_MONEY: 200,
     },
 
     // =====================

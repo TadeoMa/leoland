@@ -25,7 +25,8 @@ const Player = {
     invulnerableTimer: 0,
     dead: false,
     killCount: 0,
-    valentia: 0,
+    deathCount: 0,
+    money: 0,
     diamonds: 0,
     emeralds: 0,
 
@@ -55,7 +56,7 @@ const Player = {
         this.wingSpeed = CONFIG.PLAYER.WING_SPEED;
         this.regenRate = 0;
         this.killCount = 0;
-        this.valentia = 0;
+        this.money = 0;
         this.diamonds = 0;
         this.emeralds = 0;
         this.dead = false;
@@ -258,7 +259,7 @@ const Player = {
     _collectResource(blockType) {
         const value = CONFIG.RESOURCE_VALUES[blockType];
         if (value !== undefined && value > 0) {
-            this.valentia += value;
+            this.money += value;
         }
         if (blockType === 'diamond') {
             this.diamonds++;
@@ -352,7 +353,8 @@ const Player = {
             wingSpeed: this.wingSpeed,
             regenRate: this.regenRate,
             killCount: this.killCount,
-            valentia: this.valentia,
+            deathCount: this.deathCount,
+            money: this.money,
             diamonds: this.diamonds,
             emeralds: this.emeralds,
         };

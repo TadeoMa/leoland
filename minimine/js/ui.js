@@ -12,9 +12,10 @@ const UI = {
             healthText: document.getElementById('health-text'),
             shieldFill: document.getElementById('shield-fill'),
             shieldText: document.getElementById('shield-text'),
-            valentiaDisplay: document.getElementById('valentia-display'),
+            moneyDisplay: document.getElementById('money-display'),
             diamondsDisplay: document.getElementById('diamonds-display'),
             emeraldsDisplay: document.getElementById('emeralds-display'),
+            deathsDisplay: document.getElementById('deaths-display'),
             dayNightIndicator: document.getElementById('day-night-indicator'),
             equippedDisplay: document.getElementById('equipped-display'),
             hotbar: document.getElementById('hotbar'),
@@ -110,9 +111,10 @@ const UI = {
     },
 
     _updateResources() {
-        this.elements.valentiaDisplay.textContent = `⚔ ${Player.valentia}`;
+        this.elements.moneyDisplay.textContent = `💰 ${Player.money}`;
         this.elements.diamondsDisplay.textContent = `💎 ${Player.diamonds}`;
         this.elements.emeraldsDisplay.textContent = `🟢 ${Player.emeralds}`;
+        this.elements.deathsDisplay.textContent = `💀 ${Player.killCount}`;
     },
 
     _updateHotbar() {
@@ -198,7 +200,7 @@ const UI = {
             const canAfford = Shop.canAfford(item);
             div.style.opacity = canAfford ? '1' : '0.5';
 
-            const currency = Shop.currentTab === 'valentia' ? '⚔' : '💎';
+            const currency = Shop.currentTab === 'money' ? '💰' : '💎';
             const sprite = Sprites.get(item.id);
             let iconHTML;
             if (sprite) {

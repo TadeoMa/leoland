@@ -146,6 +146,7 @@ const Game = {
 
     showDeathScreen() {
         this.state = 'dead';
+        Player.deathCount++;
         const msg = World.housePosition
             ? 'Reaparecerás en tu casa. Los objetos guardados están a salvo.'
             : 'Reaparecerás en el punto inicial. Pierdes objetos equipados.';
@@ -163,8 +164,27 @@ const Game = {
     },
 
     showPortalNotification() {
-        // Brief visual notification - portal opened
-        // The portal renders in the world, player needs to find it
+        // Show portal opened message
+        const msg = document.createElement('div');
+        msg.textContent = '⚡ ¡PORTAL ABIERTO! ⚡';
+        msg.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(155, 89, 182, 0.95);
+            color: #fff;
+            padding: 20px 40px;
+            font-size: 24px;
+            border: 3px solid #9B59B6;
+            border-radius: 10px;
+            z-index: 1000;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            animation: pulse 0.6s ease-out;
+        `;
+        document.body.appendChild(msg);
+        setTimeout(() => msg.remove(), 3000);
     },
 
     showVillagerDialog() {
@@ -178,7 +198,7 @@ const Game = {
         screen.querySelector('h2').textContent = '¡VICTORIA!';
         screen.querySelector('h2').style.color = '#F1C40F';
         document.getElementById('death-message').textContent = 
-            `¡Has derrotado al Jefe Oscuro! +${CONFIG.PORTAL.BOSS_REWARD_VALENTIA} valentía. El mundo está a salvo.`;
+            `¡Has derrotado al Jefe Oscuro! +${CONFIG.PORTAL.BOSS_REWARD_MONEY} money. El mundo está a salvo.`;
         document.getElementById('respawn-btn').textContent = 'Continuar';
         UI.showPanel('deathScreen');
     },

@@ -37,7 +37,7 @@ const Enemies = {
 
             // Remove dead enemies
             if (enemy.health <= 0) {
-                Player.valentia += enemy.valentia;
+                Player.money += enemy.money;
                 Player.killCount++;
                 Portal.checkKills();
                 this.list.splice(i, 1);
@@ -78,7 +78,7 @@ const Enemies = {
             damage: def.damage,
             speed: def.speed,
             color: def.color,
-            valentia: def.valentia,
+            money: def.money,
             ranged: def.ranged || false,
             biome: def.biome,
             weakTo: def.weakTo || null,
@@ -111,7 +111,7 @@ const Enemies = {
             damage: def.damage,
             speed: def.speed,
             color: def.color,
-            valentia: def.valentia,
+            money: def.money,
             ranged: def.ranged || false,
             biome: def.biome,
             weakTo: def.weakTo || null,
@@ -139,7 +139,7 @@ const Enemies = {
             damage: def.damage,
             speed: def.speed,
             color: def.color,
-            valentia: def.valentia,
+            money: def.money,
             ranged: false,
             biome: 'portal',
             weakTo: null,

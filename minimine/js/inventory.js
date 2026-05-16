@@ -69,7 +69,7 @@ const Inventory = {
             };
         } else if (blockDef) {
             const icons = {
-                wood: '🪵', sand: '🟡', stone: '🪨', hardstone: '�ite',
+                wood: '🪵', sand: '🟡', stone: '🪨', hardstone: '⬛',
                 iron: '🟤', gold: '🟡', diamond: '💎', emerald: '🟢',
                 dirt: '🟫', grass: '🟩',
             };
