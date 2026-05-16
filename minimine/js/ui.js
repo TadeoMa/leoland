@@ -268,6 +268,12 @@ const UI = {
     },
 
     showDeathScreen(message) {
+        // Restaurar estado original del death-screen
+        const screen = this.elements.deathScreen;
+        screen.querySelector('h2').textContent = 'Has Muerto';
+        screen.querySelector('h2').style.color = '';
+        document.getElementById('respawn-btn').textContent = 'Respawn';
+        
         this.elements.deathMessage.textContent = message || 'Has sido derrotado...';
         this.showPanel('deathScreen');
     },
