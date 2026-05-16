@@ -50,8 +50,15 @@ const UI = {
         document.getElementById('respawn-btn').addEventListener('click', () => Game.respawn());
 
         // Portal
-        document.getElementById('enter-portal-btn').addEventListener('click', () => { Portal.enterPortal(); this.hidePanel('portalScreen'); });
-        document.getElementById('ignore-portal-btn').addEventListener('click', () => this.hidePanel('portalScreen'));
+        document.getElementById('enter-portal-btn').addEventListener('click', () => {
+            Portal.enterPortal();
+            this.hidePanel('portalScreen');
+            if (Game._portalBarTimeout) clearTimeout(Game._portalBarTimeout);
+        });
+        document.getElementById('ignore-portal-btn').addEventListener('click', () => {
+            this.hidePanel('portalScreen');
+            if (Game._portalBarTimeout) clearTimeout(Game._portalBarTimeout);
+        });
 
         // Close buttons
         document.getElementById('close-inventory').addEventListener('click', () => Game.toggleInventory());

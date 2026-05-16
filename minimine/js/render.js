@@ -270,6 +270,73 @@ const Renderer = {
                     ctx.fillRect(Utils.randomInt(0, bs - 3), Utils.randomInt(0, bs - 3), Utils.randomInt(2, 5), Utils.randomInt(2, 5));
                 }
             },
+            lava: (ctx) => {
+                ctx.fillStyle = '#CC3300';
+                ctx.fillRect(0, 0, bs, bs);
+                ctx.fillStyle = '#FF4500';
+                for (let i = 0; i < 6; i++) {
+                    ctx.beginPath();
+                    ctx.arc(Utils.randomInt(4, bs - 4), Utils.randomInt(4, bs - 4), Utils.randomInt(3, 7), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.fillStyle = '#FF6600';
+                for (let i = 0; i < 4; i++) {
+                    ctx.beginPath();
+                    ctx.arc(Utils.randomInt(6, bs - 6), Utils.randomInt(6, bs - 6), Utils.randomInt(2, 4), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.fillStyle = '#FFAA00';
+                for (let i = 0; i < 3; i++) {
+                    ctx.fillRect(Utils.randomInt(4, bs - 6), Utils.randomInt(4, bs - 6), Utils.randomInt(2, 4), Utils.randomInt(1, 3));
+                }
+            },
+            netherrack: (ctx) => {
+                ctx.fillStyle = '#6B1010';
+                ctx.fillRect(0, 0, bs, bs);
+                ctx.fillStyle = '#8B2020';
+                for (let i = 0; i < 5; i++) {
+                    ctx.fillRect(Utils.randomInt(0, bs - 5), Utils.randomInt(0, bs - 5), Utils.randomInt(3, 8), Utils.randomInt(3, 6));
+                }
+                ctx.fillStyle = '#4A0808';
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillRect(Utils.randomInt(1, bs - 4), Utils.randomInt(1, bs - 4), Utils.randomInt(2, 5), Utils.randomInt(2, 4));
+                }
+                ctx.strokeStyle = '#550E0E';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(bs * 0.2, bs * 0.5);
+                ctx.lineTo(bs * 0.5, bs * 0.4);
+                ctx.lineTo(bs * 0.8, bs * 0.6);
+                ctx.stroke();
+            },
+            obsidian: (ctx) => {
+                ctx.fillStyle = '#100820';
+                ctx.fillRect(0, 0, bs, bs);
+                ctx.fillStyle = '#1A0E30';
+                for (let i = 0; i < 6; i++) {
+                    ctx.fillRect(Utils.randomInt(0, bs - 5), Utils.randomInt(0, bs - 5), Utils.randomInt(4, 8), Utils.randomInt(3, 7));
+                }
+                ctx.fillStyle = '#2A1848';
+                for (let i = 0; i < 3; i++) {
+                    ctx.fillRect(Utils.randomInt(2, bs - 4), Utils.randomInt(2, bs - 4), Utils.randomInt(2, 4), Utils.randomInt(2, 4));
+                }
+                // Subtle purple shimmer
+                ctx.fillStyle = 'rgba(155,89,182,0.15)';
+                ctx.fillRect(Utils.randomInt(2, bs - 6), Utils.randomInt(2, bs - 6), 3, 2);
+                ctx.fillRect(Utils.randomInt(2, bs - 6), Utils.randomInt(2, bs - 6), 2, 3);
+            },
+            hellstone: (ctx) => {
+                ctx.fillStyle = '#3A0505';
+                ctx.fillRect(0, 0, bs, bs);
+                ctx.fillStyle = '#4A0A0A';
+                for (let i = 0; i < 5; i++) {
+                    ctx.fillRect(Utils.randomInt(0, bs - 5), Utils.randomInt(0, bs - 5), Utils.randomInt(4, 8), Utils.randomInt(4, 8));
+                }
+                ctx.fillStyle = '#2A0303';
+                for (let i = 0; i < 3; i++) {
+                    ctx.fillRect(Utils.randomInt(1, bs - 3), Utils.randomInt(1, bs - 3), Utils.randomInt(2, 4), Utils.randomInt(2, 4));
+                }
+            },
         };
 
         Object.entries(defs).forEach(([name, drawFn]) => {
@@ -308,8 +375,17 @@ const Renderer = {
     },
 
     clear() {
-        const skyTop = DayNight.isNight() ? '#0C1445' : '#4A90D9';
-        const skyBottom = DayNight.isNight() ? '#1A237E' : '#87CEEB';
+        let skyTop, skyBottom;
+        if (Portal.inBossArena) {
+            skyTop = '#1A0000';
+            skyBottom = '#4A0505';
+        } else if (DayNight.isNight()) {
+            skyTop = '#0C1445';
+            skyBottom = '#1A237E';
+        } else {
+            skyTop = '#4A90D9';
+            skyBottom = '#87CEEB';
+        }
         const gradient = this.ctx.createLinearGradient(0, 0, 0, this.height);
         gradient.addColorStop(0, skyTop);
         gradient.addColorStop(1, skyBottom);
@@ -321,24 +397,45 @@ const Renderer = {
         this.clear();
         Particles.update(16);
 
-        this._renderBackground(camera);
+        if (Portal.inBossArena) {
+            this._renderArenaBackground(camera);
+        } else {
+            this._renderBackground(camera);
+        }
 
         this.ctx.save();
         this.ctx.translate(-camera.x, -camera.y);
 
         this._renderWorld(camera);
-        this._renderHouse();
+        if (!Portal.inBossArena) {
+            this._renderHouse();
+        }
         this._renderPortal();
-        this._renderVillagers();
+        if (Portal.inBossArena) {
+            this._renderReturnPortal();
+            this._renderTreasure();
+            this._renderLavaGlow(camera);
+            this._renderLavaParticles();
+        }
+        if (!Portal.inBossArena) {
+            this._renderVillagers();
+        }
         this._renderPlayer();
         this._renderEnemies();
         this._renderProjectiles();
         Particles.render(this.ctx);
+        if (Portal.fireworksActive || Portal.fireworks.length > 0) {
+            this._renderFireworks();
+        }
 
         this.ctx.restore();
 
         this._renderOverlay();
-        this._renderUndergroundLight(camera);
+        if (!Portal.inBossArena) {
+            this._renderUndergroundLight(camera);
+        } else {
+            this._renderArenaAtmosphere();
+        }
     },
 
     _renderBackground(camera) {
@@ -849,6 +946,7 @@ const Renderer = {
     },
 
     _renderOverlay() {
+        if (Portal.inBossArena) return; // Arena has its own atmosphere
         if (DayNight.alpha > 0) {
             this.ctx.fillStyle = DayNight.getOverlayColor();
             this.ctx.fillRect(0, 0, this.width, this.height);
@@ -892,5 +990,268 @@ const Renderer = {
             this.ctx.fillStyle = warmGlow;
             this.ctx.fillRect(0, 0, this.width, this.height);
         }
+    },
+
+    // === Boss Arena Rendering ===
+
+    _renderArenaBackground(camera) {
+        const time = Date.now();
+
+        // Flickering fire glow in sky
+        const flicker = Math.sin(time * 0.005) * 0.1 + Math.sin(time * 0.013) * 0.05;
+        this.ctx.fillStyle = `rgba(255, 60, 0, ${0.03 + flicker * 0.02})`;
+        this.ctx.fillRect(0, 0, this.width, this.height * 0.5);
+
+        // Ember particles in background
+        for (let i = 0; i < 15; i++) {
+            const ex = (Math.sin(time * 0.001 + i * 7.3) * 0.5 + 0.5) * this.width;
+            const ey = (Math.cos(time * 0.0008 + i * 4.1) * 0.5 + 0.5) * this.height * 0.6;
+            const alpha = Math.sin(time * 0.003 + i) * 0.3 + 0.4;
+            const size = 1 + Math.sin(time * 0.004 + i * 2) * 1;
+            this.ctx.globalAlpha = alpha;
+            this.ctx.fillStyle = i % 3 === 0 ? '#FF6600' : i % 3 === 1 ? '#FF4400' : '#FFAA00';
+            this.ctx.beginPath();
+            this.ctx.arc(ex, ey, size, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        this.ctx.globalAlpha = 1;
+    },
+
+    _renderArenaAtmosphere() {
+        // Dark reddish overlay for the arena
+        const time = Date.now();
+        const flicker = Math.sin(time * 0.004) * 0.03;
+        this.ctx.fillStyle = `rgba(40, 0, 0, ${0.15 + flicker})`;
+        this.ctx.fillRect(0, 0, this.width, this.height);
+
+        // Bottom lava glow
+        const lavaGlow = this.ctx.createLinearGradient(0, this.height * 0.7, 0, this.height);
+        lavaGlow.addColorStop(0, 'rgba(255, 60, 0, 0)');
+        lavaGlow.addColorStop(1, 'rgba(255, 60, 0, 0.08)');
+        this.ctx.fillStyle = lavaGlow;
+        this.ctx.fillRect(0, 0, this.width, this.height);
+    },
+
+    _renderReturnPortal() {
+        if (!Portal.returnPortalPosition) return;
+        const p = Portal.returnPortalPosition;
+        const time = Date.now() * 0.003;
+        const cx = p.x + p.width / 2;
+        const cy = p.y + p.height / 2;
+        const active = Portal.returnPortalActive;
+
+        // Outer glow
+        const glowColor = active ? 'rgba(46,204,113,' : 'rgba(100,100,100,';
+        const outerGlow = this.ctx.createRadialGradient(cx, cy, p.width * 0.3, cx, cy, p.width * 1.5);
+        outerGlow.addColorStop(0, glowColor + (active ? '0.4)' : '0.15)'));
+        outerGlow.addColorStop(1, glowColor + '0)');
+        this.ctx.fillStyle = outerGlow;
+        this.ctx.fillRect(p.x - p.width, p.y - p.height, p.width * 3, p.height * 3);
+
+        // Frame
+        this.ctx.strokeStyle = active ? '#1B7A3D' : '#444';
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.ellipse(cx, cy, p.width / 2 + 4, p.height / 2 + 4, 0, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        // Vortex
+        const grad = this.ctx.createRadialGradient(cx, cy, 5, cx, cy, p.width / 2);
+        if (active) {
+            grad.addColorStop(0, '#A9DFBF');
+            grad.addColorStop(0.3, '#2ECC71');
+            grad.addColorStop(0.7, '#1B7A3D');
+            grad.addColorStop(1, '#0E4D26');
+        } else {
+            grad.addColorStop(0, '#888');
+            grad.addColorStop(0.5, '#555');
+            grad.addColorStop(1, '#333');
+        }
+        this.ctx.fillStyle = grad;
+        this.ctx.beginPath();
+        this.ctx.ellipse(cx, cy, p.width / 2, p.height / 2, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Energy rings
+        if (active) {
+            this.ctx.strokeStyle = 'rgba(169,223,191,0.5)';
+            this.ctx.lineWidth = 2;
+            for (let i = 0; i < 3; i++) {
+                const a = time * (1 + i * 0.5);
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx, cy, p.width * 0.15 * (i + 1), p.height * 0.2 * (i + 1), a, 0, Math.PI * 2);
+                this.ctx.stroke();
+            }
+        }
+
+        // Label
+        this.ctx.fillStyle = active ? '#2ECC71' : '#666';
+        this.ctx.font = 'bold 11px monospace';
+        this.ctx.textAlign = 'center';
+        this.ctx.shadowColor = '#000';
+        this.ctx.shadowBlur = 4;
+        this.ctx.fillText(active ? '🌀 Portal de Regreso' : '🔒 Derrota al Jefe', cx, cy - p.height / 2 - 12);
+        this.ctx.shadowBlur = 0;
+        this.ctx.textAlign = 'left';
+    },
+
+    _renderTreasure() {
+        if (!Portal.treasurePosition || Portal.treasurePosition.collected) return;
+        const t = Portal.treasurePosition;
+        const time = Date.now();
+        const bounce = Math.sin(time * 0.004) * 3;
+        const glow = Math.sin(time * 0.003) * 0.2 + 0.5;
+
+        // Treasure glow
+        const tGlow = this.ctx.createRadialGradient(
+            t.x + t.width / 2, t.y + t.height / 2, 5,
+            t.x + t.width / 2, t.y + t.height / 2, 60
+        );
+        tGlow.addColorStop(0, `rgba(255,215,0,${glow * 0.5})`);
+        tGlow.addColorStop(1, 'rgba(255,215,0,0)');
+        this.ctx.fillStyle = tGlow;
+        this.ctx.fillRect(t.x - 40, t.y - 40, t.width + 80, t.height + 80);
+
+        // Chest body
+        const cx = t.x;
+        const cy = t.y + bounce;
+        const cw = t.width;
+        const ch = t.height;
+
+        // Chest base
+        this.ctx.fillStyle = '#8B6914';
+        this.ctx.fillRect(cx, cy + ch * 0.4, cw, ch * 0.6);
+        this.ctx.strokeStyle = '#5D4E37';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(cx, cy + ch * 0.4, cw, ch * 0.6);
+
+        // Chest lid
+        this.ctx.fillStyle = '#A07818';
+        this.ctx.beginPath();
+        this.ctx.moveTo(cx, cy + ch * 0.4);
+        this.ctx.lineTo(cx, cy + ch * 0.15);
+        this.ctx.quadraticCurveTo(cx + cw / 2, cy - ch * 0.1, cx + cw, cy + ch * 0.15);
+        this.ctx.lineTo(cx + cw, cy + ch * 0.4);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        // Metal bands
+        this.ctx.fillStyle = '#DAA520';
+        this.ctx.fillRect(cx + cw * 0.1, cy + ch * 0.4, cw * 0.8, 3);
+        this.ctx.fillRect(cx + cw * 0.4, cy + ch * 0.3, cw * 0.2, ch * 0.5);
+
+        // Lock/gem
+        this.ctx.fillStyle = '#FF4444';
+        this.ctx.beginPath();
+        this.ctx.arc(cx + cw / 2, cy + ch * 0.55, 4, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Sparkles around treasure
+        for (let i = 0; i < 6; i++) {
+            const angle = (time * 0.002 + i * Math.PI / 3);
+            const dist = 30 + Math.sin(time * 0.003 + i) * 10;
+            const sx = cx + cw / 2 + Math.cos(angle) * dist;
+            const sy = cy + ch / 2 + Math.sin(angle) * dist + bounce;
+            const sparkleAlpha = Math.sin(time * 0.005 + i * 2) * 0.5 + 0.5;
+            this.ctx.globalAlpha = sparkleAlpha;
+            this.ctx.fillStyle = '#FFD700';
+            this.ctx.fillRect(sx - 2, sy - 2, 4, 4);
+            this.ctx.fillStyle = '#FFF';
+            this.ctx.fillRect(sx - 1, sy - 1, 2, 2);
+        }
+        this.ctx.globalAlpha = 1;
+
+        // "Tesoro" label
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.font = 'bold 12px monospace';
+        this.ctx.textAlign = 'center';
+        this.ctx.shadowColor = '#000';
+        this.ctx.shadowBlur = 4;
+        this.ctx.fillText('✨ Tesoro ✨', cx + cw / 2, cy - 10 + bounce);
+        this.ctx.shadowBlur = 0;
+        this.ctx.textAlign = 'left';
+    },
+
+    _renderFireworks() {
+        for (const f of Portal.fireworks) {
+            this.ctx.globalAlpha = f.alpha;
+            if (f.type === 'rocket') {
+                // Rocket trail
+                this.ctx.fillStyle = '#FFF';
+                this.ctx.beginPath();
+                this.ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+                this.ctx.fill();
+                // Trail
+                this.ctx.fillStyle = f.color;
+                for (let i = 1; i <= 4; i++) {
+                    this.ctx.globalAlpha = f.alpha * (1 - i * 0.2);
+                    this.ctx.beginPath();
+                    this.ctx.arc(f.x - f.vx * i * 0.5, f.y - f.vy * i * 0.3, f.size * (1 - i * 0.15), 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+            } else {
+                // Spark
+                this.ctx.shadowColor = f.color;
+                this.ctx.shadowBlur = 6;
+                this.ctx.fillStyle = f.color;
+                this.ctx.beginPath();
+                this.ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+                this.ctx.fill();
+                // White core
+                this.ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                this.ctx.beginPath();
+                this.ctx.arc(f.x, f.y, f.size * 0.4, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.shadowBlur = 0;
+            }
+        }
+        this.ctx.globalAlpha = 1;
+    },
+
+    _renderLavaGlow(camera) {
+        const bs = CONFIG.WORLD.BLOCK_SIZE;
+        const time = Date.now();
+        const startX = Math.max(0, Math.floor(camera.x / bs) - 1);
+        const endX = Math.min(CONFIG.WORLD.WIDTH, Math.ceil((camera.x + this.width) / bs) + 1);
+        const startY = Math.max(0, Math.floor(camera.y / bs) - 1);
+        const endY = Math.min(CONFIG.WORLD.HEIGHT, Math.ceil((camera.y + this.height) / bs) + 1);
+
+        for (let x = startX; x < endX; x++) {
+            for (let y = startY; y < endY; y++) {
+                if (World.blocks[x] && World.blocks[x][y] === 'lava') {
+                    const px = x * bs;
+                    const py = y * bs;
+                    // Animated lava glow
+                    const pulse = Math.sin(time * 0.004 + x * 0.5 + y * 0.3) * 0.15 + 0.25;
+                    this.ctx.fillStyle = `rgba(255, 80, 0, ${pulse})`;
+                    this.ctx.fillRect(px - 4, py - 4, bs + 8, bs + 8);
+                    // Surface bubbles
+                    if (Math.sin(time * 0.006 + x * 3 + y * 7) > 0.7) {
+                        this.ctx.fillStyle = 'rgba(255, 160, 0, 0.6)';
+                        this.ctx.beginPath();
+                        this.ctx.arc(
+                            px + bs * (0.3 + Math.sin(time * 0.002 + x) * 0.2),
+                            py + bs * 0.3,
+                            2 + Math.sin(time * 0.005 + x) * 1,
+                            0, Math.PI * 2
+                        );
+                        this.ctx.fill();
+                    }
+                }
+            }
+        }
+    },
+
+    _renderLavaParticles() {
+        for (const p of Portal.lavaParticles) {
+            const alpha = Math.max(0, p.life / p.maxLife);
+            this.ctx.globalAlpha = alpha * 0.8;
+            this.ctx.fillStyle = p.color;
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        this.ctx.globalAlpha = 1;
     },
 };

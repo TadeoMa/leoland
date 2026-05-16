@@ -14,6 +14,22 @@ const Enemies = {
     update(dt) {
         this.spawnTimer += dt;
 
+        // No regular spawning during boss arena
+        if (Portal.inBossArena) {
+            // Only update existing enemies (the boss)
+            for (let i = this.list.length - 1; i >= 0; i--) {
+                const enemy = this.list[i];
+                this._updateEnemy(enemy, dt);
+
+                if (enemy.health <= 0) {
+                    Player.money += enemy.money;
+                    Player.killCount++;
+                    this.list.splice(i, 1);
+                }
+            }
+            return;
+        }
+
         // Spawn logic
         const isNight = DayNight.isNight();
         const spawnRate = isNight ? CONFIG.ENEMIES.SPAWN_RATE_NIGHT : CONFIG.ENEMIES.SPAWN_RATE_DAY;

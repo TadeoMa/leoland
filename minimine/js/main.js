@@ -93,7 +93,7 @@ const Game = {
         UI.update();
 
         // Music management
-        if (Portal.bossActive) {
+        if (Portal.inBossArena) {
             AudioManager.playMusic('boss');
         } else if (DayNight.isNight()) {
             AudioManager.playMusic('night');
@@ -157,34 +157,77 @@ const Game = {
         Player.respawn();
         this.state = 'playing';
         UI.hidePanel('deathScreen');
+
+        // Re-spawn boss if died in arena and boss is still needed
+        if (Portal.inBossArena && Portal.bossActive && !Enemies.list.find(e => e.isBoss)) {
+            Portal._spawnBossInArena();
+        }
     },
 
     showPortalScreen() {
-        UI.showPanel('portalScreen');
+        // Show less intrusive portal entry bar
+        const bar = document.getElementById('portal-screen');
+        bar.classList.remove('hidden');
+        // Auto-hide after 8 seconds if not interacted
+        if (this._portalBarTimeout) clearTimeout(this._portalBarTimeout);
+        this._portalBarTimeout = setTimeout(() => {
+            bar.classList.add('hidden');
+            Portal.portalScreenShown = false;
+        }, 8000);
     },
 
     showPortalNotification() {
-        // Show portal opened message
+        // Subtle top notification that fades in/out
+        const existing = document.getElementById('portal-open-notification');
+        if (existing) existing.remove();
+
         const msg = document.createElement('div');
-        msg.textContent = '⚡ ¡PORTAL ABIERTO! ⚡';
-        msg.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(155, 89, 182, 0.95);
-            color: #fff;
-            padding: 20px 40px;
-            font-size: 24px;
-            border: 3px solid #9B59B6;
-            border-radius: 10px;
-            z-index: 1000;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            animation: pulse 0.6s ease-out;
-        `;
-        document.body.appendChild(msg);
-        setTimeout(() => msg.remove(), 3000);
+        msg.id = 'portal-open-notification';
+        msg.innerHTML = '🌀 ¡Un portal se ha abierto en el mundo!';
+        msg.className = 'game-notification portal-notification';
+        document.getElementById('game-container').appendChild(msg);
+
+        // Trigger animation
+        requestAnimationFrame(() => msg.classList.add('show'));
+        setTimeout(() => {
+            msg.classList.remove('show');
+            setTimeout(() => msg.remove(), 500);
+        }, 4000);
+    },
+
+    showBossDefeatedNotification() {
+        const existing = document.getElementById('boss-defeated-notification');
+        if (existing) existing.remove();
+
+        const msg = document.createElement('div');
+        msg.id = 'boss-defeated-notification';
+        msg.innerHTML = '🏆 ¡Jefe derrotado! Recoge el tesoro';
+        msg.className = 'game-notification victory-notification';
+        document.getElementById('game-container').appendChild(msg);
+
+        requestAnimationFrame(() => msg.classList.add('show'));
+        setTimeout(() => {
+            msg.classList.remove('show');
+            setTimeout(() => msg.remove(), 500);
+        }, 5000);
+    },
+
+    showTreasureCollectedNotification() {
+        const existing = document.getElementById('treasure-notification');
+        if (existing) existing.remove();
+
+        const rewards = `+${CONFIG.PORTAL.BOSS_REWARD_MONEY} 💰  +${CONFIG.PORTAL.BOSS_REWARD_DIAMONDS} 💎  +${CONFIG.PORTAL.BOSS_REWARD_EMERALDS} 🟢`;
+        const msg = document.createElement('div');
+        msg.id = 'treasure-notification';
+        msg.innerHTML = `✨ ¡Tesoro recogido! ${rewards}<br><small>El portal de regreso está activo</small>`;
+        msg.className = 'game-notification treasure-notification';
+        document.getElementById('game-container').appendChild(msg);
+
+        requestAnimationFrame(() => msg.classList.add('show'));
+        setTimeout(() => {
+            msg.classList.remove('show');
+            setTimeout(() => msg.remove(), 500);
+        }, 6000);
     },
 
     showVillagerDialog() {
@@ -193,14 +236,10 @@ const Game = {
     },
 
     showVictory() {
-        UI.elements.deathMessage.textContent = '';
-        const screen = UI.elements.deathScreen;
-        screen.querySelector('h2').textContent = '¡VICTORIA!';
-        screen.querySelector('h2').style.color = '#F1C40F';
-        document.getElementById('death-message').textContent = 
-            `¡Has derrotado al Jefe Oscuro! +${CONFIG.PORTAL.BOSS_REWARD_MONEY} money. El mundo está a salvo.`;
-        document.getElementById('respawn-btn').textContent = 'Continuar';
-        UI.showPanel('deathScreen');
+        // Victory is now handled through the boss arena flow
+        // Player collects treasure and returns via portal
+        // This is kept as fallback
+        this.showBossDefeatedNotification();
     },
 };
 

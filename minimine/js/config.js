@@ -176,6 +176,10 @@ const CONFIG = {
         wood: { solid: true, color: '#6D4C2A', hardness: 1, tool: 'axe' },
         leaves: { solid: false, color: '#27AE60', hardness: 0 },
         bedrock: { solid: true, color: '#1C1C1C', hardness: 999 },
+        lava: { solid: false, color: '#FF4500', hardness: 999 },
+        netherrack: { solid: true, color: '#8B0000', hardness: 999 },
+        obsidian: { solid: true, color: '#1a0a2e', hardness: 999 },
+        hellstone: { solid: true, color: '#4a0000', hardness: 999 },
     },
 
     // =====================
@@ -329,7 +333,9 @@ const CONFIG = {
          * Change this value to adjust difficulty.
          */
         KILLS_TO_OPEN: 5,
-        BOSS_REWARD_MONEY: 200,
+        BOSS_REWARD_MONEY: 500,
+        BOSS_REWARD_DIAMONDS: 5,
+        BOSS_REWARD_EMERALDS: 3,
     },
 
     // =====================

@@ -320,8 +320,12 @@ const Player = {
         this.invulnerable = true;
         this.invulnerableTimer = 2000;
 
-        // Respawn at house or spawn point
-        if (World.housePosition) {
+        // Respawn at arena entrance if in boss arena
+        if (Portal.inBossArena) {
+            const bs = CONFIG.WORLD.BLOCK_SIZE;
+            this.x = 75 * bs;
+            this.y = 38 * bs;
+        } else if (World.housePosition) {
             this.x = World.housePosition.x * CONFIG.WORLD.BLOCK_SIZE;
             this.y = (World.housePosition.y - 2) * CONFIG.WORLD.BLOCK_SIZE;
         } else {
