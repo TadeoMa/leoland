@@ -318,5 +318,188 @@ minimine/
 
 ---
 
+## 🧟 Guía: Añadir un Nuevo Monstruo
+
+Existen **dos tipos** de monstruos según cómo se dibuja su sprite:
+
+| Tipo | Descripción | Gráfico definido en |
+|------|-------------|---------------------|
+| **Canvas** | Dibujado con código Canvas 2D | `js/sprites.js` → `_generateAll()` |
+| **Sprite Sheet** | Imagen externa con frames de animación | Archivo PNG en `assets/img/` + config en `js/config.js` |
+
+---
+
+### Tipo A: Monstruo Canvas (dibujado con código)
+
+Se dibuja proceduralmente con la API Canvas. Ideal para monstruos simples o si no se dispone de imagen.
+
+#### Paso 1 — Definir estadísticas en `js/config.js`
+
+Añadir una entrada en `CONFIG.ENEMIES.TYPES`:
+
+```js
+mi_monstruo: {
+    name: 'Mi Monstruo',      // Nombre visible
+    health: 5,                 // Puntos de vida
+    damage: 2,                 // Daño al jugador
+    speed: 1.2,                // Velocidad de movimiento
+    color: '#E74C3C',          // Color principal (fallback y partículas)
+    width: 28,                 // Ancho en píxeles del hitbox
+    height: 36,                // Alto en píxeles del hitbox
+    money: 10,                 // Dinero que suelta al morir
+    biome: 'any',              // Bioma: 'any', 'forest', 'desert', 'mountains', 'caves'
+    // Opcionales:
+    // ranged: true,           // Dispara proyectiles a distancia
+    // weakTo: 'shovel',       // Herramienta que hace daño especial
+    // isBoss: true,           // Es un jefe (no spawnea normalmente)
+},
+```
+
+**Valores de `biome`:**
+- `'any'` — aparece en superficie de cualquier bioma
+- `'forest'`, `'desert'`, `'mountains'` — solo en ese bioma de superficie
+- `'caves'` — solo en subterráneo (spawn independiente del ciclo día/noche)
+
+#### Paso 2 — Crear sprite Canvas en `js/sprites.js`
+
+Añadir en el método `_generateAll()`, en la sección `// === ENEMIES ===`:
+
+```js
+this._createSprite('mi_monstruo', (ctx, s) => {
+    // s = tamaño del sprite (48px)
+    // Cuerpo
+    ctx.fillStyle = '#E74C3C';
+    ctx.fillRect(s * 0.25, s * 0.3, s * 0.5, s * 0.5);
+    // Cabeza
+    ctx.fillStyle = '#C0392B';
+    ctx.fillRect(s * 0.3, s * 0.1, s * 0.4, s * 0.25);
+    // Ojos
+    ctx.fillStyle = '#FFF';
+    ctx.fillRect(s * 0.4, s * 0.17, s * 0.06, s * 0.06);
+    ctx.fillRect(s * 0.55, s * 0.17, s * 0.06, s * 0.06);
+    // Piernas
+    ctx.fillStyle = '#922B21';
+    ctx.fillRect(s * 0.3, s * 0.78, s * 0.15, s * 0.2);
+    ctx.fillRect(s * 0.55, s * 0.78, s * 0.15, s * 0.2);
+});
+```
+
+> **Importante**: El nombre del sprite (`'mi_monstruo'`) **debe coincidir exactamente** con la key usada en `CONFIG.ENEMIES.TYPES`.
+
+#### Paso 3 — ¡Listo!
+
+No se necesitan cambios en otros archivos. El sistema de spawn (`enemies.js`) y renderizado (`render.js`) manejan todo automáticamente:
+- El spawn filtra por bioma y elige aleatoriamente entre los tipos disponibles.
+- El render busca `Sprites.get(enemy.id)` y dibuja el sprite Canvas.
+- Si el sprite no existe, dibuja un rectángulo de color como fallback.
+
+---
+
+### Tipo B: Monstruo con Sprite Sheet (imagen externa)
+
+Usa una imagen PNG con frames organizados en cuadrícula. Soporta animaciones (idle, ataque, etc.).
+
+#### Requisitos del archivo de imagen
+
+- **Formato**: PNG con transparencia
+- **Ubicación**: `assets/img/nombre_monstruo.png`
+- **Organización**: Cuadrícula regular de frames (todas las celdas del mismo tamaño)
+- **Ejemplo**: 3 columnas × 1 fila, cada frame de 64×64px → imagen total de 192×64px
+
+```
+┌──────────┬──────────┬──────────┐
+│ Frame 0  │ Frame 1  │ Frame 2  │
+│  (idle)  │(ataque 1)│(ataque 2)│
+│  64×64   │  64×64   │  64×64   │
+└──────────┴──────────┴──────────┘
+```
+
+Los frames se numeran de izquierda a derecha, de arriba a abajo:
+- Fila 0: frames 0, 1, 2, ...
+- Fila 1: frames columns, columns+1, ...
+
+#### Paso 1 — Colocar imagen en `assets/img/`
+
+Copiar el archivo PNG del sprite sheet a `assets/img/`.
+
+#### Paso 2 — Definir estadísticas + spriteSheet en `js/config.js`
+
+Añadir en `CONFIG.ENEMIES.TYPES` con la propiedad `spriteSheet`:
+
+```js
+mi_monstruo_ss: {
+    name: 'Mi Monstruo SS',
+    health: 8,
+    damage: 3,
+    speed: 1.0,
+    color: '#8B0000',          // Color fallback (si la imagen no carga)
+    width: 32,                 // Ancho del hitbox en el juego
+    height: 32,                // Alto del hitbox en el juego
+    money: 12,
+    biome: 'any',
+    spriteSheet: {
+        src: 'assets/img/mi_monstruo_ss.png',  // Ruta a la imagen
+        frameWidth: 64,        // Ancho de cada frame en la imagen
+        frameHeight: 64,       // Alto de cada frame en la imagen
+        columns: 3,            // Número de columnas en el sprite sheet
+        rows: 1,               // Número de filas en el sprite sheet
+        animations: {
+            idle: [0],         // Frames para estado normal (índices)
+            attack: [1, 2],    // Frames para animación de ataque
+        },
+    },
+},
+```
+
+**Propiedades de `spriteSheet`:**
+
+| Propiedad | Tipo | Descripción |
+|-----------|------|-------------|
+| `src` | string | Ruta relativa a la imagen PNG |
+| `frameWidth` | number | Ancho en px de cada frame en la imagen original |
+| `frameHeight` | number | Alto en px de cada frame en la imagen original |
+| `columns` | number | Número de columnas de frames |
+| `rows` | number | Número de filas de frames |
+| `animations.idle` | number[] | Índices de frames para estado normal |
+| `animations.attack` | number[] | Índices de frames para animación de ataque |
+
+**Cómo funciona la animación de ataque:**
+- Cuando el enemigo ataca, su `attackCooldown` se pone a 1000ms y baja a 0.
+- Los frames de `attack` se reparten equitativamente en ese tiempo.
+- Ejemplo con `attack: [1, 2]`: frame 1 durante los primeros 500ms, frame 2 los últimos 500ms.
+- Cuando no está atacando, muestra el primer frame de `idle`.
+
+#### Paso 3 — ¡Listo!
+
+No se necesitan cambios en `sprites.js`, `enemies.js` ni `render.js`. El sistema:
+1. `Sprites.init()` → `_loadSpriteSheets()` detecta todos los tipos con `spriteSheet` y los carga.
+2. `render.js` → `_renderEnemies()` detecta el sprite sheet y usa `Sprites.drawSpriteSheetFrame()`.
+3. Si la imagen no ha cargado aún, usa el fallback de color sólido.
+
+---
+
+### Notas generales para ambos tipos
+
+- **El `id` (key)** en `CONFIG.ENEMIES.TYPES` es el identificador interno. Debe ser único y en snake_case.
+- **`width`/`height`** definen el hitbox del enemigo, no el tamaño del sprite. El sprite se escala al hitbox.
+- **`color`** se usa como fallback visual y para las partículas al recibir daño.
+- **Spawn automático**: No hay que tocar `enemies.js`. Los monstruos aparecen según su bioma.
+- **Compatibilidad**: Un monstruo puede tener tanto sprite Canvas como sprite sheet. El sprite sheet tiene prioridad.
+- **Para añadir más animaciones en el futuro** (caminar, morir, etc.): ampliar el objeto `animations` y la lógica en `Sprites.getEnemyFrame()`.
+
+### Monstruos actuales
+
+| ID | Nombre | Tipo | Bioma | HP | Daño | Velocidad |
+|----|--------|------|-------|----|------|-----------|
+| `zombie` | Zombie | Canvas | any | 4 | 1 | 1.2 |
+| `skeleton` | Esqueleto | Canvas | any | 3 | 2 | 1.5 |
+| `sand_monster` | Monstruo de Arena | Canvas | desert | 6 | 2 | 0.8 |
+| `cave_spider` | Araña de Cueva | Canvas | caves | 3 | 1 | 2.0 |
+| `mountain_golem` | Golem de Montaña | Canvas | mountains | 10 | 3 | 0.6 |
+| `guarderdor` | Guarderdor | Sprite Sheet | any | 8 | 3 | 1.0 |
+| `boss` | Jefe Oscuro | Canvas | portal | 50 | 5 | 1.0 |
+
+---
+
 **Última actualización**: Mayo 2026  
 **Estado del proyecto**: En desarollo
