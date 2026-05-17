@@ -259,13 +259,13 @@ const CONFIG = {
             },
             guarderdor: {
                 name: 'Guarderdor',
-                health: 8,
+                health: 100,
                 damage: 3,
                 speed: 1.0,
                 color: '#8B0000',
                 width: 80,
                 height: 80,
-                money: 12,
+                money: 500,
                 biome: 'any',
                 spriteSheet: {
                     src: 'assets/img/guaderdor.png',
