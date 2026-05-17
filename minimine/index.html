@@ -92,12 +92,11 @@
             <button id="respawn-btn">Respawn</button>
         </div>
 
-        <!-- Portal/Boss Screen -->
-        <div id="portal-screen" class="panel hidden">
-            <h2>¡PORTAL ABIERTO!</h2>
-            <p>Has derrotado suficientes monstruos. Un portal dimensional se ha abierto.</p>
-            <button id="enter-portal-btn">Entrar al Portal</button>
-            <button id="ignore-portal-btn">Ignorar</button>
+        <!-- Portal Entry Bar (less intrusive) -->
+        <div id="portal-screen" class="portal-bar hidden">
+            <span class="portal-bar-text">🌀 ¿Entrar al Portal del Infierno?</span>
+            <button id="enter-portal-btn" class="portal-bar-btn enter">Entrar</button>
+            <button id="ignore-portal-btn" class="portal-bar-btn ignore">Ignorar</button>
         </div>
 
         <!-- Villager Dialog -->
@@ -115,6 +114,7 @@
         <div id="start-screen">
             <h1>MINIMINE</h1>
             <p>Supervivencia · Minería · Exploración · Combate</p>
+            <div id="local-indicator" class="hidden">[JUEGO EN LOCAL]</div>
             <button id="new-game-btn">Nueva Partida</button>
             <button id="load-game-btn">Cargar Partida</button>
             <div id="controls-info">

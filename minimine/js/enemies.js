@@ -199,6 +199,10 @@ const Enemies = {
             if (dist < bs * 2) {
                 Player.takeDamage(enemy.damage);
                 enemy.attackCooldown = 1000;
+                // Play attack sound for certain enemies
+                if (enemy.id === 'guarderdor') {
+                    AudioManager.play('SFX_HIT');
+                }
             } else if (enemy.ranged && dist < bs * 8) {
                 Combat.enemyShoot(enemy);
                 enemy.attackCooldown = 2000;

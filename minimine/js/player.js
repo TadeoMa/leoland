@@ -319,6 +319,11 @@ const Player = {
         this.shield = this.maxShield;
         this.invulnerable = true;
         this.invulnerableTimer = 2000;
+        this.lastAttackTime = 0;
+        // Clear input state to prevent continuous attack
+        Input.mouse.left = false;
+        Input.mouse.right = false;
+        Input.touch.attack = false;
 
         // Respawn at arena entrance if in boss arena
         if (Portal.inBossArena) {

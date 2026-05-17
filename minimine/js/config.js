@@ -257,6 +257,28 @@ const CONFIG = {
                 money: 15,
                 biome: 'mountains',
             },
+            guarderdor: {
+                name: 'Guarderdor',
+                health: 8,
+                damage: 3,
+                speed: 1.0,
+                color: '#8B0000',
+                width: 80,
+                height: 80,
+                money: 12,
+                biome: 'any',
+                spriteSheet: {
+                    src: 'assets/img/guaderdor.png',
+                    frameWidth: 64,
+                    frameHeight: 64,
+                    columns: 3,
+                    rows: 1,
+                    animations: {
+                        idle: [0],
+                        attack: [1, 2],
+                    },
+                },
+            },
             boss: {
                 name: 'Jefe Oscuro',
                 health: 50,

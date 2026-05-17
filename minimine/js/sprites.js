@@ -6,11 +6,14 @@
 
 const Sprites = {
     cache: {},
+    spriteSheets: {},
     size: 48,
 
     init() {
         this.cache = {};
+        this.spriteSheets = {};
         this._generateAll();
+        this._loadSpriteSheets();
     },
 
     _generateAll() {
@@ -758,5 +761,94 @@ const Sprites = {
         if (sprite) {
             ctx.drawImage(sprite, x, y, size, size);
         }
+    },
+
+    // === SPRITE SHEET SYSTEM ===
+
+    /**
+     * Loads all sprite sheets defined in CONFIG.ENEMIES.TYPES.
+     * Any enemy type with a `spriteSheet` property will be loaded automatically.
+     */
+    _loadSpriteSheets() {
+        const types = CONFIG.ENEMIES.TYPES;
+        for (const [id, def] of Object.entries(types)) {
+            if (def.spriteSheet) {
+                this.loadSpriteSheet(id, def.spriteSheet);
+            }
+        }
+    },
+
+    /**
+     * Loads a single sprite sheet.
+     * @param {string} name - Unique identifier (matches enemy id or entity id).
+     * @param {object} opts - { src, frameWidth, frameHeight, columns, rows, animations }.
+     *   animations is an object like { idle: [0], attack: [1, 2] }
+     */
+    loadSpriteSheet(name, opts) {
+        const img = new Image();
+        img.src = opts.src;
+        const entry = {
+            image: img,
+            loaded: false,
+            frameWidth: opts.frameWidth,
+            frameHeight: opts.frameHeight,
+            columns: opts.columns,
+            rows: opts.rows,
+            animations: opts.animations || { idle: [0] },
+        };
+        img.onload = () => { entry.loaded = true; };
+        this.spriteSheets[name] = entry;
+    },
+
+    /**
+     * Returns sprite sheet metadata, or null if not registered.
+     */
+    getSpriteSheet(name) {
+        return this.spriteSheets[name] || null;
+    },
+
+    /**
+     * Draws a specific frame from a sprite sheet.
+     * @returns {boolean} true if drawn successfully, false otherwise.
+     */
+    drawSpriteSheetFrame(ctx, name, frameIndex, x, y, width, height, flipX) {
+        const sheet = this.spriteSheets[name];
+        if (!sheet || !sheet.loaded) return false;
+
+        const col = frameIndex % sheet.columns;
+        const row = Math.floor(frameIndex / sheet.columns);
+        const sx = col * sheet.frameWidth;
+        const sy = row * sheet.frameHeight;
+
+        ctx.save();
+        if (flipX) {
+            ctx.translate(x + width, y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(sheet.image, sx, sy, sheet.frameWidth, sheet.frameHeight, 0, 0, width, height);
+        } else {
+            ctx.drawImage(sheet.image, sx, sy, sheet.frameWidth, sheet.frameHeight, x, y, width, height);
+        }
+        ctx.restore();
+        return true;
+    },
+
+    /**
+     * Determines the correct frame index for an enemy based on its state.
+     * Uses attackCooldown to decide between idle and attack animations.
+     */
+    getEnemyFrame(enemy) {
+        const sheet = this.spriteSheets[enemy.id];
+        if (!sheet) return 0;
+
+        const anims = sheet.animations;
+        if (enemy.attackCooldown > 0 && anims.attack && anims.attack.length > 0) {
+            const attackFrames = anims.attack;
+            const progress = 1 - (enemy.attackCooldown / 1000);
+            const idx = Math.min(Math.floor(progress * attackFrames.length), attackFrames.length - 1);
+            return attackFrames[idx];
+        }
+
+        const idleFrames = anims.idle || [0];
+        return idleFrames[0];
     },
 };

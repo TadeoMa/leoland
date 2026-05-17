@@ -676,24 +676,39 @@ const Renderer = {
             this.ctx.ellipse(enemy.x + enemy.width / 2, enemy.y + enemy.height + 2, enemy.width * 0.35, 3, 0, 0, Math.PI * 2);
             this.ctx.fill();
 
-            // Sprite
-            const sprite = Sprites.get(enemy.id);
-            if (sprite) {
-                this.ctx.save();
-                if (enemy.direction < 0) {
-                    this.ctx.translate(enemy.x + enemy.width, enemy.y);
-                    this.ctx.scale(-1, 1);
-                    this.ctx.drawImage(sprite, 0, 0, enemy.width, enemy.height);
+            // Sprite sheet, canvas sprite, or fallback
+            const enemyDef = CONFIG.ENEMIES.TYPES[enemy.id];
+            const hasSheet = enemyDef && enemyDef.spriteSheet;
+            let drawn = false;
+
+            if (hasSheet) {
+                const frame = Sprites.getEnemyFrame(enemy);
+                drawn = Sprites.drawSpriteSheetFrame(
+                    this.ctx, enemy.id, frame,
+                    enemy.x, enemy.y, enemy.width, enemy.height,
+                    enemy.direction < 0
+                );
+            }
+
+            if (!drawn) {
+                const sprite = Sprites.get(enemy.id);
+                if (sprite) {
+                    this.ctx.save();
+                    if (enemy.direction < 0) {
+                        this.ctx.translate(enemy.x + enemy.width, enemy.y);
+                        this.ctx.scale(-1, 1);
+                        this.ctx.drawImage(sprite, 0, 0, enemy.width, enemy.height);
+                    } else {
+                        this.ctx.drawImage(sprite, enemy.x, enemy.y, enemy.width, enemy.height);
+                    }
+                    this.ctx.restore();
                 } else {
-                    this.ctx.drawImage(sprite, enemy.x, enemy.y, enemy.width, enemy.height);
+                    this.ctx.fillStyle = enemy.color;
+                    this.ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+                    this.ctx.fillStyle = '#E74C3C';
+                    const eyeX = enemy.direction > 0 ? enemy.x + enemy.width - 8 : enemy.x + 4;
+                    this.ctx.fillRect(eyeX, enemy.y + 6, 4, 4);
                 }
-                this.ctx.restore();
-            } else {
-                this.ctx.fillStyle = enemy.color;
-                this.ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-                this.ctx.fillStyle = '#E74C3C';
-                const eyeX = enemy.direction > 0 ? enemy.x + enemy.width - 8 : enemy.x + 4;
-                this.ctx.fillRect(eyeX, enemy.y + 6, 4, 4);
             }
 
             // Health bar
