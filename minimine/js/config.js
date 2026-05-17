@@ -183,13 +183,13 @@ const CONFIG = {
     },
 
     // =====================
-    // RESOURCE VALUES (Dinero points)
+    // RESOURCE VALUES (Money points)
     // =====================
     RESOURCE_VALUES: {
         sand: 0,
         dirt: 0,
-        wood: 4,
-        stone: 8,
+        wood: 2,
+        stone: 1,
         hardstone: 10,
         iron: 20,
         gold: 30,
