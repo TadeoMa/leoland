@@ -241,9 +241,206 @@ const Game = {
         // This is kept as fallback
         this.showBossDefeatedNotification();
     },
+
+    // === TEST MODE (only available locally) ===
+
+    testMode() {
+        this.state = 'playing';
+        UI.hideStartScreen();
+
+        // Initialize all systems
+        World.generate();
+        Player.reset();
+        Player.init();
+        Inventory.init();
+        Enemies.init();
+        Combat.init();
+        DayNight.init();
+        Portal.init();
+
+        // === TEST MODE ENHANCEMENTS ===
+
+        // Give player massive stats for testing
+        Player.health = 1000;
+        Player.maxHealth = 1000;
+        Player.shield = 1000;
+        Player.maxShield = 1000;
+        Player.money = 10000;
+        Player.diamonds = 100;
+        Player.emeralds = 100;
+        Player.hasWings = true;
+
+        // Give full inventory with all tools and weapons
+        Inventory.inventory = [
+            { id: 'sword', quantity: 1 },
+            { id: 'hammer', quantity: 1 },
+            { id: 'bow', quantity: 1 },
+            { id: 'trident', quantity: 1 },
+            { id: 'pickaxe', quantity: 1 },
+            { id: 'axe', quantity: 1 },
+            { id: 'shovel', quantity: 1 },
+            { id: 'enchanted_sword', quantity: 1 },
+            { id: 'enchanted_bow', quantity: 1 },
+            { id: 'enchanted_trident', quantity: 1 },
+            { id: 'wings', quantity: 1 },
+            { id: 'golden_wings', quantity: 1 },
+            { id: 'health_potion', quantity: 10 },
+            { id: 'shield_potion', quantity: 10 },
+            { id: 'wood', quantity: 50 },
+            { id: 'stone', quantity: 50 },
+            { id: 'diamond', quantity: 20 },
+        ];
+        Inventory.hotbar = [0, 1, 2, 3, 4, 5, 6];
+
+        // Spawn all enemy types across the map for testing
+        const enemyTypes = Object.keys(CONFIG.ENEMIES.TYPES).filter(id => !CONFIG.ENEMIES.TYPES[id].isBoss);
+        const bs = CONFIG.WORLD.BLOCK_SIZE;
+        const testSpawnPositions = [
+            { x: 30, y: 20 },
+            { x: 60, y: 20 },
+            { x: 90, y: 20 },
+            { x: 120, y: 20 },
+            { x: 150, y: 20 },
+            { x: 50, y: 35 },
+            { x: 100, y: 35 },
+            { x: 150, y: 35 },
+        ];
+
+        for (let i = 0; i < Math.min(enemyTypes.length, testSpawnPositions.length); i++) {
+            const enemyId = enemyTypes[i];
+            const def = CONFIG.ENEMIES.TYPES[enemyId];
+            const pos = testSpawnPositions[i];
+
+            Enemies.list.push({
+                id: enemyId,
+                x: pos.x * bs,
+                y: pos.y * bs,
+                vx: 0,
+                vy: 0,
+                width: def.width,
+                height: def.height,
+                health: def.health,
+                maxHealth: def.health,
+                damage: def.damage,
+                speed: def.speed,
+                color: def.color,
+                money: def.money,
+                ranged: def.ranged || false,
+                biome: def.biome,
+                weakTo: def.weakTo || null,
+                isBoss: false,
+                attackCooldown: 0,
+                direction: -1,
+            });
+        }
+
+        // Show test mode indicator
+        const indicator = document.createElement('div');
+        indicator.id = 'test-mode-indicator';
+        indicator.innerHTML = '🔧 MODO TEST ACTIVO - Presiona T para teleportarte · L para cambiar hora del día';
+        indicator.style.cssText = `
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #E74C3C;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            z-index: 1000;
+            font-size: 12px;
+        `;
+        document.getElementById('game-container').appendChild(indicator);
+
+        // Add debug shortcuts for test mode
+        this._testModeShortcuts = (e) => {
+            if (this.state !== 'playing') return;
+
+            // T: Teleport to random location
+            if (e.key.toLowerCase() === 't') {
+                const bs = CONFIG.WORLD.BLOCK_SIZE;
+                Player.x = Math.random() * (CONFIG.WORLD.WIDTH - 5) * bs;
+                Player.y = Math.random() * (CONFIG.WORLD.HEIGHT - 20) * bs;
+            }
+
+            // L: Toggle day/night (lerp through cycle)
+            if (e.key.toLowerCase() === 'l') {
+                DayNight.time = DayNight.isNight() ? 0 : DayNight.DAY_DURATION / 2;
+            }
+
+            // K: Spawn random enemy
+            if (e.key.toLowerCase() === 'k') {
+                const types = Object.keys(CONFIG.ENEMIES.TYPES).filter(id => !CONFIG.ENEMIES.TYPES[id].isBoss);
+                const randomType = Utils.randomChoice(types)[0];
+                const def = CONFIG.ENEMIES.TYPES[randomType];
+                const bs = CONFIG.WORLD.BLOCK_SIZE;
+
+                Enemies.list.push({
+                    id: randomType,
+                    x: (Player.x / bs + Utils.randomInt(-5, 5)) * bs,
+                    y: (Player.y / bs - 3) * bs,
+                    vx: 0,
+                    vy: 0,
+                    width: def.width,
+                    height: def.height,
+                    health: def.health,
+                    maxHealth: def.health,
+                    damage: def.damage,
+                    speed: def.speed,
+                    color: def.color,
+                    money: def.money,
+                    ranged: def.ranged || false,
+                    biome: def.biome,
+                    weakTo: def.weakTo || null,
+                    isBoss: false,
+                    attackCooldown: 0,
+                    direction: -1,
+                });
+            }
+
+            // M: Give money
+            if (e.key.toLowerCase() === 'm') {
+                Player.money += 1000;
+                Particles.add(Player.x, Player.y, 'hit', '#F1C40F');
+            }
+
+            // H: Full heal
+            if (e.key.toLowerCase() === 'h') {
+                Player.health = Player.maxHealth;
+                Player.shield = Player.maxShield;
+                Particles.add(Player.x, Player.y, 'hit', '#27AE60');
+            }
+        };
+
+        document.addEventListener('keydown', this._testModeShortcuts);
+
+        this.running = true;
+        this.paused = false;
+        this.lastTime = performance.now();
+        this._loop();
+    },
 };
 
 // === Bootstrap ===
 window.addEventListener('DOMContentLoaded', () => {
     Game.start();
+
+    // Show test mode button if running locally
+    if (CONFIG.IS_LOCAL) {
+        document.getElementById('local-indicator').classList.remove('hidden');
+        document.getElementById('test-mode-btn').classList.remove('hidden');
+
+        document.getElementById('test-mode-btn').addEventListener('click', () => {
+            Game.testMode();
+        });
+    }
+
+    document.getElementById('new-game-btn').addEventListener('click', () => {
+        Game.newGame();
+    });
+
+    document.getElementById('load-game-btn').addEventListener('click', () => {
+        Game.loadGame();
+    });
 });
