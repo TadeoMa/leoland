@@ -171,7 +171,7 @@ const Enemies = {
         const dy = Player.y - enemy.y;
 
         enemy.direction = dx > 0 ? 1 : -1;
-        enemy.vx = enemy.direction * enemy.speed;
+        enemy.vx = enemy.attackCooldown > 0 ? 0 : enemy.direction * enemy.speed;
 
         // Gravity
         enemy.vy += CONFIG.PLAYER.GRAVITY;
