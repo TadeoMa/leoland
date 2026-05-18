@@ -849,6 +849,10 @@ const Sprites = {
         }
 
         const idleFrames = anims.idle || [0];
-        return idleFrames[0];
+        if (idleFrames.length === 1) return idleFrames[0];
+
+        const cycleTime = 400;
+        const idx = Math.floor((Date.now() / cycleTime) % idleFrames.length);
+        return idleFrames[idx];
     },
 };
