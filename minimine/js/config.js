@@ -9,11 +9,14 @@ const CONFIG = {
     // DEBUG / ENVIRONMENT
     // =====================
     IS_LOCAL: (() => {
+        const protocol = window.location.protocol;
         const hostname = window.location.hostname;
-        return hostname === 'localhost' || 
-               hostname === '127.0.0.1' || 
-               hostname.includes('.local') ||
-               hostname === '';
+
+        if (protocol === 'file:') return true;
+
+        return hostname === 'localhost' ||
+               hostname === '127.0.0.1' ||
+               hostname.includes('.local');
     })(),
 
     // =====================
