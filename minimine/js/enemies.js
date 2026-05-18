@@ -201,7 +201,7 @@ const Enemies = {
                 enemy.attackCooldown = 1000;
                 // Play attack sound for certain enemies
                 if (enemy.id === 'guarderdor') {
-                    AudioManager.play('SFX_HIT');
+                    AudioManager.play('SFX_GROWL');
                 }
             } else if (enemy.ranged && dist < bs * 8) {
                 Combat.enemyShoot(enemy);
