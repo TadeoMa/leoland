@@ -337,7 +337,7 @@ const Game = {
         // Show test mode indicator
         const indicator = document.createElement('div');
         indicator.id = 'test-mode-indicator';
-        indicator.innerHTML = '🔧 MODO TEST ACTIVO - Presiona T para teleportarte · L para cambiar hora del día';
+        indicator.innerHTML = '🔧 MODO DIOS ACTIVO - Presiona T para teleportarte · L para cambiar hora del día';
         indicator.style.cssText = `
             position: fixed;
             top: 10px;
