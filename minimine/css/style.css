@@ -194,6 +194,11 @@ html, body {
     color: #aaa;
 }
 
+/* Hidden utility */
+.hidden {
+    display: none !important;
+}
+
 /* Panels */
 .panel {
     position: fixed;

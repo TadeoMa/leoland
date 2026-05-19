@@ -426,14 +426,20 @@ const Game = {
 window.addEventListener('DOMContentLoaded', () => {
     Game.start();
 
-    // Show test mode button if running locally
-    if (CONFIG.IS_LOCAL) {
-        document.getElementById('local-indicator').classList.remove('hidden');
-        document.getElementById('test-mode-btn').classList.remove('hidden');
+    const localIndicator = document.getElementById('local-indicator');
+    const testModeBtn = document.getElementById('test-mode-btn');
 
-        document.getElementById('test-mode-btn').addEventListener('click', () => {
+    // Show test mode button only in local environment
+    if (CONFIG.IS_LOCAL) {
+        localIndicator.classList.remove('hidden');
+        testModeBtn.classList.remove('hidden');
+
+        testModeBtn.addEventListener('click', () => {
             Game.testMode();
         });
+    } else {
+        localIndicator.classList.add('hidden');
+        testModeBtn.classList.add('hidden');
     }
 
     document.getElementById('new-game-btn').addEventListener('click', () => {
