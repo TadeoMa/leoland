@@ -54,35 +54,58 @@ const Sprites = {
         });
 
         this._createSprite('pickaxe', (ctx, s) => {
+            ctx.save();
+            ctx.translate(s, 0);
+            ctx.rotate(Math.PI / 2);
+
             // Handle
             ctx.fillStyle = '#8B5E3C';
             ctx.save();
-            ctx.translate(s * 0.5, s * 0.5);
+            ctx.translate(s * 0.5, s * 0.45);
             ctx.rotate(-0.7);
-            ctx.fillRect(-s * 0.06, -s * 0.05, s * 0.12, s * 0.55);
+            ctx.fillRect(-s * 0.06, -s * 0.05, s * 0.12, s * 0.72);
             ctx.restore();
+
             // Head
-            ctx.fillStyle = '#666';
             ctx.save();
-            ctx.translate(s * 0.5, s * 0.3);
+            ctx.translate(s * 0.5, s * 0.45);
             ctx.rotate(-0.7);
-            ctx.fillRect(-s * 0.35, -s * 0.06, s * 0.7, s * 0.12);
-            // Tips
+            ctx.fillStyle = '#666';
+            ctx.fillRect(-s * 0.35, -s * 0.07, s * 0.7, s * 0.14);
+
+            // Left spike
             ctx.fillStyle = '#555';
             ctx.beginPath();
-            ctx.moveTo(-s * 0.35, -s * 0.06);
-            ctx.lineTo(-s * 0.42, s * 0.04);
-            ctx.lineTo(-s * 0.35, s * 0.06);
+            ctx.moveTo(-s * 0.35, -s * 0.07);
+            ctx.lineTo(-s * 0.52, 0);
+            ctx.lineTo(-s * 0.35, s * 0.07);
+            ctx.closePath();
             ctx.fill();
+
+            // Right spike
             ctx.beginPath();
-            ctx.moveTo(s * 0.35, -s * 0.06);
-            ctx.lineTo(s * 0.42, s * 0.04);
-            ctx.lineTo(s * 0.35, s * 0.06);
+            ctx.moveTo(s * 0.35, -s * 0.07);
+            ctx.lineTo(s * 0.52, 0);
+            ctx.lineTo(s * 0.35, s * 0.07);
+            ctx.closePath();
             ctx.fill();
+
+            // Center reinforcement
+            ctx.fillStyle = '#777';
+            ctx.fillRect(-s * 0.02, -s * 0.07, s * 0.04, s * 0.14);
+
+            // Edge shine
+            ctx.fillStyle = '#888';
+            ctx.fillRect(-s * 0.04, -s * 0.02, s * 0.08, s * 0.04);
+            ctx.restore();
             ctx.restore();
         });
 
         this._createSprite('sword', (ctx, s) => {
+            ctx.save();
+            ctx.translate(s, 0);
+            ctx.rotate(Math.PI / 2);
+
             // Blade
             ctx.fillStyle = '#C0C0C0';
             ctx.save();
@@ -109,6 +132,7 @@ const Sprites = {
             ctx.beginPath();
             ctx.arc(0, s * 0.4, s * 0.05, 0, Math.PI * 2);
             ctx.fill();
+            ctx.restore();
             ctx.restore();
         });
 
