@@ -29,6 +29,7 @@ const Player = {
     money: 0,
     diamonds: 0,
     emeralds: 0,
+    materials: {},
 
     init() {
         const spawn = World.getSpawnPoint();
@@ -45,6 +46,7 @@ const Player = {
         this.invulnerableTimer = 0;
         this.lastAttackTime = 0;
         this.lastRegenTime = 0;
+        this.materials = {};
     },
 
     reset() {
@@ -59,6 +61,7 @@ const Player = {
         this.money = 0;
         this.diamonds = 0;
         this.emeralds = 0;
+        this.materials = {};
         this.dead = false;
     },
 
@@ -267,8 +270,8 @@ const Player = {
         if (blockType === 'emerald') {
             this.emeralds++;
         }
-        // Add to inventory
-        Inventory.addItem(blockType, 1);
+        // Track mined material in HUD counter
+        this.materials[blockType] = (this.materials[blockType] || 0) + 1;
     },
 
     takeDamage(amount) {
@@ -366,11 +369,13 @@ const Player = {
             money: this.money,
             diamonds: this.diamonds,
             emeralds: this.emeralds,
+            materials: this.materials,
         };
     },
 
     fromSaveData(data) {
         Object.assign(this, data);
+        this.materials = data.materials || {};
         this.dead = false;
         this.vx = 0;
         this.vy = 0;

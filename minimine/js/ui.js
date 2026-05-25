@@ -12,6 +12,7 @@ const UI = {
             healthText: document.getElementById('health-text'),
             shieldFill: document.getElementById('shield-fill'),
             shieldText: document.getElementById('shield-text'),
+            materialsDisplay: document.getElementById('materials-display'),
             moneyDisplay: document.getElementById('money-display'),
             diamondsDisplay: document.getElementById('diamonds-display'),
             emeraldsDisplay: document.getElementById('emeralds-display'),
@@ -108,6 +109,7 @@ const UI = {
     update() {
         this._updateBars();
         this._updateResources();
+        this._updateMaterials();
         this._updateHotbar();
         this._updateDayNight();
         this._updateEquipped();
@@ -128,6 +130,24 @@ const UI = {
         this.elements.diamondsDisplay.textContent = `💎 ${Player.diamonds}`;
         this.elements.emeraldsDisplay.textContent = `🟢 ${Player.emeralds}`;
         this.elements.deathsDisplay.textContent = `💀 ${Player.killCount}`;
+    },
+
+    _updateMaterials() {
+        const icons = {
+            wood: '🪵', stone: '🪨', hardstone: '⬛',
+            iron: '🟤', gold: '🟡', diamond: '💎',
+            emerald: '🟢', sand: '🏜️', dirt: '🟫', grass: '🌱',
+        };
+        const mats = Player.materials || {};
+        const parts = [];
+        for (const [id, count] of Object.entries(mats)) {
+            if (count > 0) {
+                const icon = icons[id] || '📦';
+                parts.push(`<span class="mat-entry">${icon} <span class="mat-count">${count}</span></span>`);
+            }
+        }
+        this.elements.materialsDisplay.innerHTML = parts.join('');
+        this.elements.materialsDisplay.style.display = parts.length > 0 ? 'flex' : 'none';
     },
 
     _updateHotbar() {

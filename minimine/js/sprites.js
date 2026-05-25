@@ -800,6 +800,45 @@ const Sprites = {
                 this.loadSpriteSheet(id, def.spriteSheet);
             }
         }
+        // Load player sprite sheet
+        if (CONFIG.PLAYER.SPRITE_SHEET) {
+            this.loadSpriteSheet('player_sheet', CONFIG.PLAYER.SPRITE_SHEET);
+        }
+    },
+
+    /**
+     * Determines the correct frame index for the player based on state.
+     */
+    getPlayerFrame(player) {
+        const sheet = this.spriteSheets['player_sheet'];
+        if (!sheet) return 0;
+
+        const anims = sheet.animations;
+
+        // Attacking (use Input if available)
+        const attacking = (typeof Input !== 'undefined' && Input.isAttack && Input.isAttack());
+        if (attacking && anims.attack && anims.attack.length > 0) {
+            const attackFrames = anims.attack;
+            const progress = (Date.now() % 400) / 400;
+            const idx = Math.min(Math.floor(progress * attackFrames.length), attackFrames.length - 1);
+            return attackFrames[idx];
+        }
+
+        // Walking (player.vx !== 0)
+        const moving = player.vx !== 0;
+        if (moving && anims.walk && anims.walk.length > 0) {
+            const walkFrames = anims.walk;
+            const cycleTime = 300;
+            const idx = Math.floor((Date.now() / cycleTime) % walkFrames.length);
+            return walkFrames[idx];
+        }
+
+        // Idle
+        const idleFrames = anims.idle || [0];
+        if (idleFrames.length === 1) return idleFrames[0];
+        const cycleTime = 500;
+        const idx = Math.floor((Date.now() / cycleTime) % idleFrames.length);
+        return idleFrames[idx];
     },
 
     /**

@@ -627,16 +627,28 @@ const Renderer = {
             }
         }
 
-        // Player sprite
-        const spriteName = p.facingRight ? 'player' : 'player_left';
-        const sprite = Sprites.get(spriteName);
-        if (sprite) {
-            this.ctx.drawImage(sprite, p.x - 4, p.y - 2, p.width + 8, p.height + 4);
-        } else {
-            this.ctx.fillStyle = '#3498DB';
-            this.ctx.fillRect(p.x, p.y, p.width, p.height);
-            this.ctx.fillStyle = '#F5CBA7';
-            this.ctx.fillRect(p.x + 5, p.y, p.width - 10, 14);
+        // Player sprite (sprite sheet or fallback)
+        let playerDrawn = false;
+        const playerSheet = Sprites.getSpriteSheet('player_sheet');
+        if (playerSheet && playerSheet.loaded) {
+            const frame = Sprites.getPlayerFrame(p);
+            playerDrawn = Sprites.drawSpriteSheetFrame(
+                this.ctx, 'player_sheet', frame,
+                p.x - 4, p.y - 2, p.width + 8, p.height + 4,
+                !p.facingRight
+            );
+        }
+        if (!playerDrawn) {
+            const spriteName = p.facingRight ? 'player' : 'player_left';
+            const sprite = Sprites.get(spriteName);
+            if (sprite) {
+                this.ctx.drawImage(sprite, p.x - 4, p.y - 2, p.width + 8, p.height + 4);
+            } else {
+                this.ctx.fillStyle = '#3498DB';
+                this.ctx.fillRect(p.x, p.y, p.width, p.height);
+                this.ctx.fillStyle = '#F5CBA7';
+                this.ctx.fillRect(p.x + 5, p.y, p.width - 10, 14);
+            }
         }
 
         // Tool with swing animation

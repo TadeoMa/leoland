@@ -35,16 +35,9 @@ const Inventory = {
     },
 
     addItem(id, count = 1) {
-        // Check if item already exists (stackable resources)
+        // Resources (mined materials) are tracked in Player.materials, not in inventory
         const isResource = CONFIG.BLOCKS[id] !== undefined;
-        
-        if (isResource) {
-            const existing = this.slots.find(s => s.id === id);
-            if (existing) {
-                existing.count += count;
-                return true;
-            }
-        }
+        if (isResource) return false;
 
         // Check for tool/weapon duplicates
         const isTool = CONFIG.TOOLS[id] || CONFIG.ENCHANTED[id];

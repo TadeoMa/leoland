@@ -42,11 +42,23 @@ const CONFIG = {
         JUMP_FORCE: -10,
         GRAVITY: 0.5,
         MAX_FALL_SPEED: 12,
-        WIDTH: 24,
-        HEIGHT: 40,
+        WIDTH: 32,
+        HEIGHT: 32,
         REGEN_RATE: 0,       // HP regenerated per second (0 = none, upgradeable)
         HAS_WINGS: false,
         WING_SPEED: -3,
+        SPRITE_SHEET: {
+            src: 'assets/img/guaderdor-sheet.png',
+            frameWidth: 64,
+            frameHeight: 64,
+            columns: 2,
+            rows: 2,
+            animations: {
+                idle: [0],
+                walk: [0, 1],
+                attack: [2, 3],
+            },
+        },
     },
 
     // =====================
