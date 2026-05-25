@@ -695,6 +695,19 @@ button:active {
     line-height: 1.5;
 }
 
+.key-notification {
+    background: rgba(211, 155, 35, 0.8);
+    border: 2px solid rgba(241, 196, 15, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.star-notification {
+    background: rgba(230, 126, 34, 0.85);
+    border: 2px solid rgba(241, 196, 15, 0.7);
+    backdrop-filter: blur(4px);
+    font-size: 15px;
+}
+
 /* Villager Dialog */
 #villager-dialog {
     text-align: center;

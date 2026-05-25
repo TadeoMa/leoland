@@ -36,10 +36,10 @@ const Portal = {
         this.lavaParticles = [];
     },
 
-    checkKills() {
+    checkStars() {
         if (this.isOpen || this.bossDefeated) return;
 
-        if (Player.killCount >= CONFIG.PORTAL.KILLS_TO_OPEN) {
+        if (Player.stars >= CONFIG.PORTAL.STARS_TO_OPEN) {
             this.openPortal();
         }
     },
@@ -379,13 +379,11 @@ const Portal = {
         return {
             isOpen: this.isOpen,
             bossDefeated: this.bossDefeated,
-            killCount: Player.killCount,
         };
     },
 
     fromSaveData(data) {
         this.isOpen = data.isOpen || false;
         this.bossDefeated = data.bossDefeated || false;
-        if (data.killCount !== undefined) Player.killCount = data.killCount;
     },
 };

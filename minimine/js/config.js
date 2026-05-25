@@ -366,10 +366,12 @@ const CONFIG = {
     // =====================
     PORTAL: {
         /** 
-         * EDITABLE: Number of monsters to kill before portal opens.
-         * Change this value to adjust difficulty.
+         * EDITABLE: Stars needed to open the portal.
+         * Each star is obtained by opening the chest with 5 keys.
          */
-        KILLS_TO_OPEN: 5,
+        STARS_TO_OPEN: 3,
+        KEYS_NEEDED: 5,         // Keys required to open the chest once
+        KEY_DROP_CHANCE: 0.4,   // 40% chance to drop a key on enemy kill
         BOSS_REWARD_MONEY: 500,
         BOSS_REWARD_DIAMONDS: 5,
         BOSS_REWARD_EMERALDS: 3,

@@ -9,6 +9,8 @@ const World = {
     villagers: [],     // NPC positions
     housePosition: null,
     portalPosition: null,
+    chestPosition: null,   // Star chest position
+    chestOpened: 0,        // How many times the chest has been opened (0-3)
     savedWorldState: null, // Saved state for boss arena transition
 
     init() {
@@ -17,6 +19,8 @@ const World = {
         this.villagers = [];
         this.housePosition = null;
         this.portalPosition = null;
+        this.chestPosition = null;
+        this.chestOpened = 0;
         this.savedWorldState = null;
     },
 
@@ -63,6 +67,9 @@ const World = {
 
         // Place villagers
         this._placeVillagers();
+
+        // Place star chest
+        this._placeChest();
     },
 
     getBiomeAt(x) {
@@ -212,6 +219,20 @@ const World = {
         }
     },
 
+    _placeChest() {
+        const bs = CONFIG.WORLD.BLOCK_SIZE;
+        // Place chest at roughly 1/3 of the world, on the surface
+        const cx = Math.floor(CONFIG.WORLD.WIDTH / 3);
+        const surfaceY = this.getSurfaceY(cx);
+        this.chestPosition = {
+            x: cx * bs,
+            y: (surfaceY - 1) * bs,
+            width: bs,
+            height: bs,
+        };
+        this.chestOpened = 0;
+    },
+
     getBlock(bx, by) {
         if (bx < 0 || bx >= CONFIG.WORLD.WIDTH || by < 0 || by >= CONFIG.WORLD.HEIGHT) {
             return 'bedrock';
@@ -295,6 +316,8 @@ const World = {
             villagers: this.villagers,
             housePosition: this.housePosition,
             portalPosition: this.portalPosition,
+            chestPosition: this.chestPosition,
+            chestOpened: this.chestOpened,
         };
     },
 
@@ -303,6 +326,8 @@ const World = {
         this.villagers = data.villagers || [];
         this.housePosition = data.housePosition;
         this.portalPosition = data.portalPosition;
+        this.chestPosition = data.chestPosition || null;
+        this.chestOpened = data.chestOpened || 0;
     },
 
     saveWorldState() {
@@ -312,6 +337,8 @@ const World = {
             villagers: [...this.villagers],
             housePosition: this.housePosition,
             portalPosition: this.portalPosition,
+            chestPosition: this.chestPosition,
+            chestOpened: this.chestOpened,
         };
     },
 
@@ -322,6 +349,8 @@ const World = {
         this.villagers = this.savedWorldState.villagers;
         this.housePosition = this.savedWorldState.housePosition;
         this.portalPosition = this.savedWorldState.portalPosition;
+        this.chestPosition = this.savedWorldState.chestPosition;
+        this.chestOpened = this.savedWorldState.chestOpened;
         this.savedWorldState = null;
     },
 

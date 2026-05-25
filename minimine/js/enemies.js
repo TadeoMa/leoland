@@ -24,9 +24,11 @@ const Enemies = {
                 if (enemy.health <= 0) {
                     Player.money += enemy.money;
                     Player.killCount++;
-                    this.list.splice(i, 1);
+                // 40% chance to drop a key
+                if (!enemy.isBoss && Math.random() < CONFIG.PORTAL.KEY_DROP_CHANCE) {
+                    Player.keys++;
+                    Game.showKeyDropNotification();
                 }
-            }
             return;
         }
 
@@ -55,7 +57,11 @@ const Enemies = {
             if (enemy.health <= 0) {
                 Player.money += enemy.money;
                 Player.killCount++;
-                Portal.checkKills();
+                // 40% chance to drop a key
+                if (!enemy.isBoss && Math.random() < CONFIG.PORTAL.KEY_DROP_CHANCE) {
+                    Player.keys++;
+                    Game.showKeyDropNotification();
+                }
                 this.list.splice(i, 1);
             }
 

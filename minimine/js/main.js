@@ -235,6 +235,97 @@ const Game = {
         UI.showPanel('villagerDialog');
     },
 
+    tryOpenChest() {
+        if (!World.chestPosition) return;
+        if (Portal.isOpen || Portal.bossDefeated) return;
+        if (World.chestOpened >= CONFIG.PORTAL.STARS_TO_OPEN) return;
+
+        if (Player.keys < CONFIG.PORTAL.KEYS_NEEDED) {
+            Game.showChestLockedNotification();
+            return;
+        }
+
+        // Consume keys and give a star
+        Player.keys -= CONFIG.PORTAL.KEYS_NEEDED;
+        Player.stars++;
+        World.chestOpened++;
+        AudioManager.play('SFX_PURCHASE');
+
+        Game.showStarObtainedNotification();
+
+        // Check if portal can open
+        Portal.checkStars();
+    },
+
+    showKeyDropNotification() {
+        // Don't spam — coalesce within 1.5s
+        if (this._keyDropTimeout) {
+            clearTimeout(this._keyDropTimeout);
+            this._keyDropCount = (this._keyDropCount || 0) + 1;
+        } else {
+            this._keyDropCount = 1;
+        }
+        this._keyDropTimeout = setTimeout(() => {
+            this._keyDropTimeout = null;
+            const count = this._keyDropCount || 1;
+            this._keyDropCount = 0;
+
+            const existing = document.getElementById('key-drop-notification');
+            if (existing) existing.remove();
+
+            const msg = document.createElement('div');
+            msg.id = 'key-drop-notification';
+            msg.innerHTML = `🗝️ +${count} llave${count > 1 ? 's' : ''} (${Player.keys}/${CONFIG.PORTAL.KEYS_NEEDED})`;
+            msg.className = 'game-notification key-notification';
+            document.getElementById('game-container').appendChild(msg);
+
+            requestAnimationFrame(() => msg.classList.add('show'));
+            setTimeout(() => {
+                msg.classList.remove('show');
+                setTimeout(() => msg.remove(), 500);
+            }, 2500);
+        }, 300);
+    },
+
+    showChestLockedNotification() {
+        const existing = document.getElementById('chest-locked-notification');
+        if (existing) existing.remove();
+
+        const msg = document.createElement('div');
+        msg.id = 'chest-locked-notification';
+        msg.innerHTML = `🔒 Necesitas ${CONFIG.PORTAL.KEYS_NEEDED} llaves (tienes ${Player.keys})`;
+        msg.className = 'game-notification key-notification';
+        document.getElementById('game-container').appendChild(msg);
+
+        requestAnimationFrame(() => msg.classList.add('show'));
+        setTimeout(() => {
+            msg.classList.remove('show');
+            setTimeout(() => msg.remove(), 500);
+        }, 3000);
+    },
+
+    showStarObtainedNotification() {
+        const existing = document.getElementById('star-notification');
+        if (existing) existing.remove();
+
+        const remaining = CONFIG.PORTAL.STARS_TO_OPEN - Player.stars;
+        const msg = document.createElement('div');
+        msg.id = 'star-notification';
+        if (remaining > 0) {
+            msg.innerHTML = `⭐ ¡Estrella obtenida! (${Player.stars}/${CONFIG.PORTAL.STARS_TO_OPEN}) — Faltan ${remaining}`;
+        } else {
+            msg.innerHTML = `⭐ ¡Tienes las 3 estrellas! ¡El portal se ha abierto!`;
+        }
+        msg.className = 'game-notification star-notification';
+        document.getElementById('game-container').appendChild(msg);
+
+        requestAnimationFrame(() => msg.classList.add('show'));
+        setTimeout(() => {
+            msg.classList.remove('show');
+            setTimeout(() => msg.remove(), 500);
+        }, 4000);
+    },
+
     showVictory() {
         // Victory is now handled through the boss arena flow
         // Player collects treasure and returns via portal
@@ -268,6 +359,8 @@ const Game = {
         Player.money = 10000;
         Player.diamonds = 100;
         Player.emeralds = 100;
+        Player.keys = 15;
+        Player.stars = 0;
         Player.hasWings = true;
 
         // Give full inventory with all tools and weapons

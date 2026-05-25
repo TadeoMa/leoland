@@ -419,6 +419,7 @@ const Renderer = {
         }
         if (!Portal.inBossArena) {
             this._renderVillagers();
+            this._renderChest();
         }
         this._renderPlayer();
         this._renderEnemies();
@@ -826,6 +827,82 @@ const Renderer = {
                 this.ctx.shadowBlur = 0;
                 this.ctx.textAlign = 'left';
             }
+        }
+    },
+
+    _renderChest() {
+        if (!World.chestPosition) return;
+        if (Portal.isOpen && World.chestOpened >= CONFIG.PORTAL.STARS_TO_OPEN) return;
+
+        const chest = World.chestPosition;
+        const cx = chest.x;
+        const cy = chest.y;
+        const bs = CONFIG.WORLD.BLOCK_SIZE;
+        const t = Date.now() * 0.002;
+
+        // Glow pulse
+        const glow = Math.sin(t) * 0.4 + 0.6;
+        this.ctx.globalAlpha = glow * 0.35;
+        this.ctx.fillStyle = '#F1C40F';
+        this.ctx.fillRect(cx - 6, cy - 6, bs + 12, bs + 12);
+        this.ctx.globalAlpha = 1;
+
+        // Chest body
+        this.ctx.fillStyle = '#6B4E0A';
+        this.ctx.fillRect(cx, cy, bs, bs);
+
+        // Chest lid
+        this.ctx.fillStyle = '#8B6914';
+        this.ctx.fillRect(cx, cy, bs, bs * 0.45);
+
+        // Metal bands
+        this.ctx.strokeStyle = '#B7950B';
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeRect(cx + 2, cy + 2, bs - 4, bs - 4);
+        this.ctx.beginPath();
+        this.ctx.moveTo(cx + 2, cy + bs * 0.45);
+        this.ctx.lineTo(cx + bs - 2, cy + bs * 0.45);
+        this.ctx.stroke();
+
+        // Lock
+        const lockX = cx + bs / 2;
+        const lockY = cy + bs * 0.45;
+        this.ctx.fillStyle = '#F1C40F';
+        this.ctx.fillRect(lockX - 5, lockY - 6, 10, 8);
+        this.ctx.beginPath();
+        this.ctx.arc(lockX, lockY - 7, 5, Math.PI, 0);
+        this.ctx.strokeStyle = '#F1C40F';
+        this.ctx.lineWidth = 3;
+        this.ctx.stroke();
+
+        // Stars already obtained shown above chest
+        const starsObtained = Player.stars;
+        for (let i = 0; i < CONFIG.PORTAL.STARS_TO_OPEN; i++) {
+            const sx = cx + bs / 2 - (CONFIG.PORTAL.STARS_TO_OPEN * 14) / 2 + i * 14 + 7;
+            const sy = cy - 20;
+            this.ctx.font = '14px serif';
+            this.ctx.globalAlpha = i < starsObtained ? 1 : 0.25;
+            this.ctx.fillText('⭐', sx - 7, sy);
+        }
+        this.ctx.globalAlpha = 1;
+
+        // Proximity label
+        const dist = Utils.distance(
+            Player.x + Player.width / 2, Player.y + Player.height / 2,
+            cx + bs / 2, cy + bs / 2
+        );
+        if (dist < CONFIG.WORLD.BLOCK_SIZE * 3.5) {
+            const bounce = Math.sin(t * 2) * 3;
+            const keysLabel = Player.keys >= CONFIG.PORTAL.KEYS_NEEDED
+                ? '🔓 [E] Abrir cofre'
+                : `🔒 [E] Necesitas ${CONFIG.PORTAL.KEYS_NEEDED} 🗝️`;
+            this.ctx.fillStyle = 'rgba(0,0,0,0.65)';
+            this.ctx.fillRect(cx - 20, cy - 46 + bounce, bs + 40, 20);
+            this.ctx.fillStyle = Player.keys >= CONFIG.PORTAL.KEYS_NEEDED ? '#F1C40F' : '#E74C3C';
+            this.ctx.font = 'bold 10px monospace';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(keysLabel, cx + bs / 2, cy - 32 + bounce);
+            this.ctx.textAlign = 'left';
         }
     },
 

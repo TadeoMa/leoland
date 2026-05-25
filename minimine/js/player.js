@@ -29,6 +29,8 @@ const Player = {
     money: 0,
     diamonds: 0,
     emeralds: 0,
+    keys: 0,
+    stars: 0,
     materials: {},
 
     init() {
@@ -61,6 +63,8 @@ const Player = {
         this.money = 0;
         this.diamonds = 0;
         this.emeralds = 0;
+        this.keys = 0;
+        this.stars = 0;
         this.materials = {};
         this.dead = false;
     },
@@ -245,6 +249,19 @@ const Player = {
             }
         }
 
+        // Check for star chest
+        if (World.chestPosition && !Portal.isOpen && !Portal.bossDefeated) {
+            const chest = World.chestPosition;
+            const dist = Utils.distance(
+                this.x + this.width / 2, this.y + this.height / 2,
+                chest.x + chest.width / 2, chest.y + chest.height / 2
+            );
+            if (dist < CONFIG.WORLD.BLOCK_SIZE * 3) {
+                Game.tryOpenChest();
+                return;
+            }
+        }
+
         // Check for portal
         if (World.portalPosition) {
             const portal = World.portalPosition;
@@ -369,6 +386,8 @@ const Player = {
             money: this.money,
             diamonds: this.diamonds,
             emeralds: this.emeralds,
+            keys: this.keys,
+            stars: this.stars,
             materials: this.materials,
         };
     },
@@ -376,6 +395,8 @@ const Player = {
     fromSaveData(data) {
         Object.assign(this, data);
         this.materials = data.materials || {};
+        this.keys = data.keys || 0;
+        this.stars = data.stars || 0;
         this.dead = false;
         this.vx = 0;
         this.vy = 0;

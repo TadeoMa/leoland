@@ -17,6 +17,8 @@ const UI = {
             diamondsDisplay: document.getElementById('diamonds-display'),
             emeraldsDisplay: document.getElementById('emeralds-display'),
             deathsDisplay: document.getElementById('deaths-display'),
+            keysDisplay: document.getElementById('keys-display'),
+            starsDisplay: document.getElementById('stars-display'),
             dayNightIndicator: document.getElementById('day-night-indicator'),
             equippedDisplay: document.getElementById('equipped-display'),
             hotbar: document.getElementById('hotbar'),
@@ -130,6 +132,9 @@ const UI = {
         this.elements.diamondsDisplay.textContent = `💎 ${Player.diamonds}`;
         this.elements.emeraldsDisplay.textContent = `🟢 ${Player.emeralds}`;
         this.elements.deathsDisplay.textContent = `💀 ${Player.killCount}`;
+        this.elements.keysDisplay.textContent = `🗝️ ${Player.keys}`;
+        const starsTotal = CONFIG.PORTAL.STARS_TO_OPEN;
+        this.elements.starsDisplay.textContent = `⭐ ${Player.stars}/${starsTotal}`;
     },
 
     _updateMaterials() {
