@@ -12,9 +12,11 @@ const UI = {
             healthText: document.getElementById('health-text'),
             shieldFill: document.getElementById('shield-fill'),
             shieldText: document.getElementById('shield-text'),
-            valentiaDisplay: document.getElementById('valentia-display'),
+            materialsDisplay: document.getElementById('materials-display'),
+            moneyDisplay: document.getElementById('money-display'),
             diamondsDisplay: document.getElementById('diamonds-display'),
             emeraldsDisplay: document.getElementById('emeralds-display'),
+            deathsDisplay: document.getElementById('deaths-display'),
             dayNightIndicator: document.getElementById('day-night-indicator'),
             equippedDisplay: document.getElementById('equipped-display'),
             hotbar: document.getElementById('hotbar'),
@@ -49,8 +51,15 @@ const UI = {
         document.getElementById('respawn-btn').addEventListener('click', () => Game.respawn());
 
         // Portal
-        document.getElementById('enter-portal-btn').addEventListener('click', () => { Portal.enterPortal(); this.hidePanel('portalScreen'); });
-        document.getElementById('ignore-portal-btn').addEventListener('click', () => this.hidePanel('portalScreen'));
+        document.getElementById('enter-portal-btn').addEventListener('click', () => {
+            Portal.enterPortal();
+            this.hidePanel('portalScreen');
+            if (Game._portalBarTimeout) clearTimeout(Game._portalBarTimeout);
+        });
+        document.getElementById('ignore-portal-btn').addEventListener('click', () => {
+            this.hidePanel('portalScreen');
+            if (Game._portalBarTimeout) clearTimeout(Game._portalBarTimeout);
+        });
 
         // Close buttons
         document.getElementById('close-inventory').addEventListener('click', () => Game.toggleInventory());
@@ -74,6 +83,12 @@ const UI = {
         if (!SaveSystem.hasSave()) {
             document.getElementById('load-game-btn').style.opacity = '0.5';
         }
+
+        // Show local indicator if in local environment
+        const localIndicator = document.getElementById('local-indicator');
+        if (CONFIG.IS_LOCAL) {
+            localIndicator.classList.remove('hidden');
+        }
     },
 
     _buildHotbar() {
@@ -94,6 +109,7 @@ const UI = {
     update() {
         this._updateBars();
         this._updateResources();
+        this._updateMaterials();
         this._updateHotbar();
         this._updateDayNight();
         this._updateEquipped();
@@ -110,9 +126,28 @@ const UI = {
     },
 
     _updateResources() {
-        this.elements.valentiaDisplay.textContent = `⚔ ${Player.valentia}`;
+        this.elements.moneyDisplay.textContent = `💰 ${Player.money}`;
         this.elements.diamondsDisplay.textContent = `💎 ${Player.diamonds}`;
         this.elements.emeraldsDisplay.textContent = `🟢 ${Player.emeralds}`;
+        this.elements.deathsDisplay.textContent = `💀 ${Player.killCount}`;
+    },
+
+    _updateMaterials() {
+        const icons = {
+            wood: '🪵', stone: '🪨', hardstone: '⬛',
+            iron: '🟤', gold: '🟡', diamond: '💎',
+            emerald: '🟢', sand: '🏜️', dirt: '🟫', grass: '🌱',
+        };
+        const mats = Player.materials || {};
+        const parts = [];
+        for (const [id, count] of Object.entries(mats)) {
+            if (count > 0) {
+                const icon = icons[id] || '📦';
+                parts.push(`<span class="mat-entry">${icon} <span class="mat-count">${count}</span></span>`);
+            }
+        }
+        this.elements.materialsDisplay.innerHTML = parts.join('');
+        this.elements.materialsDisplay.style.display = parts.length > 0 ? 'flex' : 'none';
     },
 
     _updateHotbar() {
@@ -198,7 +233,7 @@ const UI = {
             const canAfford = Shop.canAfford(item);
             div.style.opacity = canAfford ? '1' : '0.5';
 
-            const currency = Shop.currentTab === 'valentia' ? '⚔' : '💎';
+            const currency = Shop.currentTab === 'money' ? '💰' : '💎';
             const sprite = Sprites.get(item.id);
             let iconHTML;
             if (sprite) {
@@ -266,6 +301,12 @@ const UI = {
     },
 
     showDeathScreen(message) {
+        // Restaurar estado original del death-screen
+        const screen = this.elements.deathScreen;
+        screen.querySelector('h2').textContent = 'Has Muerto';
+        screen.querySelector('h2').style.color = '';
+        document.getElementById('respawn-btn').textContent = 'Respawn';
+        
         this.elements.deathMessage.textContent = message || 'Has sido derrotado...';
         this.showPanel('deathScreen');
     },

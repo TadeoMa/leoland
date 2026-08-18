@@ -14,6 +14,22 @@ const Enemies = {
     update(dt) {
         this.spawnTimer += dt;
 
+        // No regular spawning during boss arena
+        if (Portal.inBossArena) {
+            // Only update existing enemies (the boss)
+            for (let i = this.list.length - 1; i >= 0; i--) {
+                const enemy = this.list[i];
+                this._updateEnemy(enemy, dt);
+
+                if (enemy.health <= 0) {
+                    Player.money += enemy.money;
+                    Player.killCount++;
+                    this.list.splice(i, 1);
+                }
+            }
+            return;
+        }
+
         // Spawn logic
         const isNight = DayNight.isNight();
         const spawnRate = isNight ? CONFIG.ENEMIES.SPAWN_RATE_NIGHT : CONFIG.ENEMIES.SPAWN_RATE_DAY;
@@ -37,7 +53,7 @@ const Enemies = {
 
             // Remove dead enemies
             if (enemy.health <= 0) {
-                Player.valentia += enemy.valentia;
+                Player.money += enemy.money;
                 Player.killCount++;
                 Portal.checkKills();
                 this.list.splice(i, 1);
@@ -78,7 +94,7 @@ const Enemies = {
             damage: def.damage,
             speed: def.speed,
             color: def.color,
-            valentia: def.valentia,
+            money: def.money,
             ranged: def.ranged || false,
             biome: def.biome,
             weakTo: def.weakTo || null,
@@ -111,7 +127,7 @@ const Enemies = {
             damage: def.damage,
             speed: def.speed,
             color: def.color,
-            valentia: def.valentia,
+            money: def.money,
             ranged: def.ranged || false,
             biome: def.biome,
             weakTo: def.weakTo || null,
@@ -139,7 +155,7 @@ const Enemies = {
             damage: def.damage,
             speed: def.speed,
             color: def.color,
-            valentia: def.valentia,
+            money: def.money,
             ranged: false,
             biome: 'portal',
             weakTo: null,
@@ -155,7 +171,7 @@ const Enemies = {
         const dy = Player.y - enemy.y;
 
         enemy.direction = dx > 0 ? 1 : -1;
-        enemy.vx = enemy.direction * enemy.speed;
+        enemy.vx = enemy.attackCooldown > 0 ? 0 : enemy.direction * enemy.speed;
 
         // Gravity
         enemy.vy += CONFIG.PLAYER.GRAVITY;
@@ -183,6 +199,10 @@ const Enemies = {
             if (dist < bs * 2) {
                 Player.takeDamage(enemy.damage);
                 enemy.attackCooldown = 1000;
+                // Play attack sound for certain enemies
+                if (enemy.id === 'guarderdor') {
+                    AudioManager.play('SFX_GROWL');
+                }
             } else if (enemy.ranged && dist < bs * 8) {
                 Combat.enemyShoot(enemy);
                 enemy.attackCooldown = 2000;

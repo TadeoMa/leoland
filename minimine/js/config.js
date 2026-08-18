@@ -6,6 +6,20 @@
 
 const CONFIG = {
     // =====================
+    // DEBUG / ENVIRONMENT
+    // =====================
+    IS_LOCAL: (() => {
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+
+        if (protocol === 'file:') return true;
+
+        return hostname === 'localhost' ||
+               hostname === '127.0.0.1' ||
+               hostname.includes('.local');
+    })(),
+
+    // =====================
     // WORLD
     // =====================
     WORLD: {
@@ -28,11 +42,23 @@ const CONFIG = {
         JUMP_FORCE: -10,
         GRAVITY: 0.5,
         MAX_FALL_SPEED: 12,
-        WIDTH: 24,
-        HEIGHT: 40,
+        WIDTH: 64,
+        HEIGHT: 64,
         REGEN_RATE: 0,       // HP regenerated per second (0 = none, upgradeable)
         HAS_WINGS: false,
         WING_SPEED: -3,
+        SPRITE_SHEET: {
+            src: 'assets/img/player-sheet.png',
+            frameWidth: 128,
+            frameHeight: 128,
+            columns: 2,
+            rows: 2,
+            animations: {
+                idle: [0],
+                walk: [0, 1],
+                attack: [0, 2],
+            },
+        },
     },
 
     // =====================
@@ -165,16 +191,20 @@ const CONFIG = {
         wood: { solid: true, color: '#6D4C2A', hardness: 1, tool: 'axe' },
         leaves: { solid: false, color: '#27AE60', hardness: 0 },
         bedrock: { solid: true, color: '#1C1C1C', hardness: 999 },
+        lava: { solid: false, color: '#FF4500', hardness: 999 },
+        netherrack: { solid: true, color: '#8B0000', hardness: 999 },
+        obsidian: { solid: true, color: '#1a0a2e', hardness: 999 },
+        hellstone: { solid: true, color: '#4a0000', hardness: 999 },
     },
 
     // =====================
-    // RESOURCE VALUES (Valentía points)
+    // RESOURCE VALUES (Money points)
     // =====================
     RESOURCE_VALUES: {
         sand: 0,
         dirt: 0,
-        wood: 4,
-        stone: 8,
+        wood: 2,
+        stone: 1,
         hardstone: 10,
         iron: 20,
         gold: 30,
@@ -193,7 +223,7 @@ const CONFIG = {
                 color: '#27AE60',
                 width: 24,
                 height: 38,
-                valentia: 5,
+                money: 5,
                 biome: 'any',
             },
             skeleton: {
@@ -204,7 +234,7 @@ const CONFIG = {
                 color: '#ECF0F1',
                 width: 22,
                 height: 38,
-                valentia: 8,
+                money: 8,
                 biome: 'any',
                 ranged: true,
             },
@@ -216,7 +246,7 @@ const CONFIG = {
                 color: '#D4AC0D',
                 width: 30,
                 height: 30,
-                valentia: 10,
+                money: 10,
                 biome: 'desert',
                 weakTo: 'shovel',
             },
@@ -228,7 +258,7 @@ const CONFIG = {
                 color: '#6C3483',
                 width: 28,
                 height: 18,
-                valentia: 7,
+                money: 7,
                 biome: 'caves',
             },
             mountain_golem: {
@@ -239,8 +269,30 @@ const CONFIG = {
                 color: '#5D6D7E',
                 width: 32,
                 height: 42,
-                valentia: 15,
+                money: 15,
                 biome: 'mountains',
+            },
+            guarderdor: {
+                name: 'Guarderdor',
+                health: 100,
+                damage: 3,
+                speed: 1.0,
+                color: '#8B0000',
+                width: 80,
+                height: 80,
+                money: 500,
+                biome: 'any',
+                spriteSheet: {
+                    src: 'assets/img/guaderdor-sheet.png',
+                    frameWidth: 64,
+                    frameHeight: 64,
+                    columns: 2,
+                    rows: 2,
+                    animations: {
+                        idle: [0, 1],
+                        attack: [2, 3],
+                    },
+                },
             },
             boss: {
                 name: 'Jefe Oscuro',
@@ -250,7 +302,7 @@ const CONFIG = {
                 color: '#8E44AD',
                 width: 48,
                 height: 56,
-                valentia: 100,
+                money: 100,
                 biome: 'portal',
                 isBoss: true,
             },
@@ -265,7 +317,7 @@ const CONFIG = {
     // SHOP
     // =====================
     SHOP: {
-        VALENTIA_ITEMS: [
+        MONEY_ITEMS: [
             { id: 'house', name: 'Casa', icon: '🏠', price: 50, description: 'Punto de respawn y almacén' },
             { id: 'health_potion', name: 'Poción de Vida', icon: '❤️', price: 15, description: '+3 vida' },
             { id: 'shield_potion', name: 'Poción de Escudo', icon: '🛡️', price: 20, description: '+3 escudo' },
@@ -318,7 +370,9 @@ const CONFIG = {
          * Change this value to adjust difficulty.
          */
         KILLS_TO_OPEN: 5,
-        BOSS_REWARD_VALENTIA: 200,
+        BOSS_REWARD_MONEY: 500,
+        BOSS_REWARD_DIAMONDS: 5,
+        BOSS_REWARD_EMERALDS: 3,
     },
 
     // =====================

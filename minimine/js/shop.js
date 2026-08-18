@@ -3,18 +3,18 @@
  */
 
 const Shop = {
-    currentTab: 'valentia',
+    currentTab: 'money',
 
     getItems() {
-        if (this.currentTab === 'valentia') {
-            return CONFIG.SHOP.VALENTIA_ITEMS;
+        if (this.currentTab === 'money') {
+            return CONFIG.SHOP.MONEY_ITEMS;
         }
         return CONFIG.SHOP.DIAMOND_ITEMS;
     },
 
     canAfford(item) {
-        if (this.currentTab === 'valentia') {
-            return Player.valentia >= item.price;
+        if (this.currentTab === 'money') {
+            return Player.money >= item.price;
         }
         return Player.diamonds >= item.price;
     },
@@ -23,8 +23,8 @@ const Shop = {
         if (!this.canAfford(item)) return false;
 
         // Deduct cost
-        if (this.currentTab === 'valentia') {
-            Player.valentia -= item.price;
+        if (this.currentTab === 'money') {
+            Player.money -= item.price;
         } else {
             Player.diamonds -= item.price;
         }

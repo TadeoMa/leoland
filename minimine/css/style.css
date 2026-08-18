@@ -4,6 +4,21 @@
     box-sizing: border-box;
 }
 
+/* Portal Animation */
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
 html, body {
     width: 100%;
     height: 100%;
@@ -112,6 +127,30 @@ html, body {
     border-radius: 4px;
 }
 
+#materials-display {
+    display: none;
+    flex-wrap: wrap;
+    gap: 6px;
+    color: #fff;
+    font-size: 13px;
+    text-shadow: 1px 1px 2px #000;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.45);
+    border-radius: 4px;
+    max-width: 200px;
+}
+
+.mat-entry {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+}
+
+.mat-count {
+    font-weight: bold;
+}
+
 #day-night-indicator {
     width: 30px;
     height: 30px;
@@ -177,6 +216,11 @@ html, body {
     right: 4px;
     font-size: 9px;
     color: #aaa;
+}
+
+/* Hidden utility */
+.hidden {
+    display: none !important;
 }
 
 /* Panels */
@@ -325,13 +369,13 @@ button:active {
 }
 
 #shop-panel {
-    min-width: 480px;
+    min-width: 540px;
 }
 
 #shop-items {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
     max-height: 50vh;
     overflow-y: auto;
 }
@@ -340,7 +384,7 @@ button:active {
     background: rgba(40, 40, 50, 0.9);
     border: 2px solid #444;
     border-radius: 6px;
-    padding: 10px;
+    padding: 6px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
@@ -352,25 +396,25 @@ button:active {
 }
 
 .shop-item .item-icon {
-    font-size: 28px;
-    margin-bottom: 5px;
+    font-size: 20px;
+    margin-bottom: 2px;
 }
 
 .shop-item .item-name {
-    font-size: 13px;
+    font-size: 10px;
     color: #ecf0f1;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .shop-item .item-price {
-    font-size: 11px;
+    font-size: 9px;
     color: #f39c12;
 }
 
 .shop-item .item-desc {
-    font-size: 10px;
+    font-size: 8px;
     color: #888;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 /* Mobile Controls */
@@ -470,6 +514,18 @@ button:active {
     margin-bottom: 30px;
 }
 
+#local-indicator {
+    font-size: 12px;
+    color: #f39c12;
+    margin-bottom: 15px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    padding: 8px 12px;
+    border: 2px solid #f39c12;
+    border-radius: 4px;
+    background: rgba(243, 156, 18, 0.1);
+}
+
 #start-screen button {
     width: 220px;
     padding: 14px;
@@ -521,8 +577,122 @@ button:active {
     text-align: center;
 }
 
-#portal-screen h2 {
-    color: #9b59b6;
+/* Portal Entry Bar (less intrusive) */
+.portal-bar {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(155, 89, 182, 0.75);
+    backdrop-filter: blur(4px);
+    border: 2px solid rgba(155, 89, 182, 0.6);
+    border-radius: 30px;
+    padding: 8px 20px;
+    color: #fff;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    animation: slideDown 0.4s ease-out;
+}
+
+.portal-bar.hidden {
+    display: none;
+}
+
+.portal-bar-text {
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.portal-bar-btn {
+    padding: 5px 14px;
+    font-size: 12px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    transition: all 0.2s;
+}
+
+.portal-bar-btn.enter {
+    background: rgba(46, 204, 113, 0.8);
+    color: #fff;
+}
+
+.portal-bar-btn.enter:hover {
+    background: rgba(46, 204, 113, 1);
+}
+
+.portal-bar-btn.ignore {
+    background: rgba(100, 100, 100, 0.6);
+    color: #ccc;
+}
+
+.portal-bar-btn.ignore:hover {
+    background: rgba(100, 100, 100, 0.8);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Game Notifications (non-intrusive) */
+.game-notification {
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-60px);
+    padding: 10px 24px;
+    border-radius: 25px;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    z-index: 150;
+    pointer-events: none;
+    opacity: 0;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.game-notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.portal-notification {
+    background: rgba(155, 89, 182, 0.7);
+    border: 2px solid rgba(155, 89, 182, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.victory-notification {
+    background: rgba(241, 196, 15, 0.7);
+    border: 2px solid rgba(241, 196, 15, 0.5);
+    color: #000;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+    backdrop-filter: blur(4px);
+}
+
+.treasure-notification {
+    background: rgba(46, 204, 113, 0.7);
+    border: 2px solid rgba(46, 204, 113, 0.5);
+    backdrop-filter: blur(4px);
+    line-height: 1.5;
 }
 
 /* Villager Dialog */

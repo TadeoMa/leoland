@@ -38,6 +38,7 @@ const AudioManager = {
 
         switch (key) {
             case 'SFX_HIT': this._playHit(); break;
+            case 'SFX_GROWL': this._playGrowl(); break;
             case 'SFX_MINE': this._playMine(); break;
             case 'SFX_DEATH': this._playDeath(); break;
             case 'SFX_PURCHASE': this._playPurchase(); break;
@@ -90,6 +91,23 @@ const AudioManager = {
     _playAttack() {
         this._playTone(400, 0.08, 'square', 0.2);
         this._playTone(300, 0.1, 'sawtooth', 0.15);
+    },
+
+    _playGrowl() {
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140, t);
+        osc.frequency.exponentialRampToValueAtTime(80, t + 0.35);
+        gain.gain.setValueAtTime(0.22 * this.volume, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.45);
+        this._playNoise(0.3, 0.14);
+        setTimeout(() => this._playTone(120, 0.15, 'sawtooth', 0.12), 80);
     },
 
     _playDamage() {

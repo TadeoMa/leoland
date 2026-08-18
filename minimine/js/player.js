@@ -25,9 +25,11 @@ const Player = {
     invulnerableTimer: 0,
     dead: false,
     killCount: 0,
-    valentia: 0,
+    deathCount: 0,
+    money: 0,
     diamonds: 0,
     emeralds: 0,
+    materials: {},
 
     init() {
         const spawn = World.getSpawnPoint();
@@ -44,6 +46,7 @@ const Player = {
         this.invulnerableTimer = 0;
         this.lastAttackTime = 0;
         this.lastRegenTime = 0;
+        this.materials = {};
     },
 
     reset() {
@@ -55,9 +58,10 @@ const Player = {
         this.wingSpeed = CONFIG.PLAYER.WING_SPEED;
         this.regenRate = 0;
         this.killCount = 0;
-        this.valentia = 0;
+        this.money = 0;
         this.diamonds = 0;
         this.emeralds = 0;
+        this.materials = {};
         this.dead = false;
     },
 
@@ -258,7 +262,7 @@ const Player = {
     _collectResource(blockType) {
         const value = CONFIG.RESOURCE_VALUES[blockType];
         if (value !== undefined && value > 0) {
-            this.valentia += value;
+            this.money += value;
         }
         if (blockType === 'diamond') {
             this.diamonds++;
@@ -266,8 +270,8 @@ const Player = {
         if (blockType === 'emerald') {
             this.emeralds++;
         }
-        // Add to inventory
-        Inventory.addItem(blockType, 1);
+        // Track mined material in HUD counter
+        this.materials[blockType] = (this.materials[blockType] || 0) + 1;
     },
 
     takeDamage(amount) {
@@ -318,9 +322,18 @@ const Player = {
         this.shield = this.maxShield;
         this.invulnerable = true;
         this.invulnerableTimer = 2000;
+        this.lastAttackTime = 0;
+        // Clear input state to prevent continuous attack
+        Input.mouse.left = false;
+        Input.mouse.right = false;
+        Input.touch.attack = false;
 
-        // Respawn at house or spawn point
-        if (World.housePosition) {
+        // Respawn at arena entrance if in boss arena
+        if (Portal.inBossArena) {
+            const bs = CONFIG.WORLD.BLOCK_SIZE;
+            this.x = 75 * bs;
+            this.y = 38 * bs;
+        } else if (World.housePosition) {
             this.x = World.housePosition.x * CONFIG.WORLD.BLOCK_SIZE;
             this.y = (World.housePosition.y - 2) * CONFIG.WORLD.BLOCK_SIZE;
         } else {
@@ -352,14 +365,17 @@ const Player = {
             wingSpeed: this.wingSpeed,
             regenRate: this.regenRate,
             killCount: this.killCount,
-            valentia: this.valentia,
+            deathCount: this.deathCount,
+            money: this.money,
             diamonds: this.diamonds,
             emeralds: this.emeralds,
+            materials: this.materials,
         };
     },
 
     fromSaveData(data) {
         Object.assign(this, data);
+        this.materials = data.materials || {};
         this.dead = false;
         this.vx = 0;
         this.vy = 0;

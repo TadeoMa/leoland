@@ -13,6 +13,9 @@ const SaveSystem = {
     },
 
     update() {
+        // Don't auto-save during boss arena
+        if (Portal.inBossArena) return;
+
         const now = Utils.timestamp();
         if (now - this.lastSave > this.AUTO_SAVE_INTERVAL) {
             this.save();

@@ -6,11 +6,14 @@
 
 const Sprites = {
     cache: {},
+    spriteSheets: {},
     size: 48,
 
     init() {
         this.cache = {};
+        this.spriteSheets = {};
         this._generateAll();
+        this._loadSpriteSheets();
     },
 
     _generateAll() {
@@ -51,35 +54,58 @@ const Sprites = {
         });
 
         this._createSprite('pickaxe', (ctx, s) => {
+            ctx.save();
+            ctx.translate(s, 0);
+            ctx.rotate(Math.PI / 2);
+
             // Handle
             ctx.fillStyle = '#8B5E3C';
             ctx.save();
-            ctx.translate(s * 0.5, s * 0.5);
+            ctx.translate(s * 0.5, s * 0.45);
             ctx.rotate(-0.7);
-            ctx.fillRect(-s * 0.06, -s * 0.05, s * 0.12, s * 0.55);
+            ctx.fillRect(-s * 0.06, -s * 0.05, s * 0.12, s * 0.72);
             ctx.restore();
+
             // Head
-            ctx.fillStyle = '#666';
             ctx.save();
-            ctx.translate(s * 0.5, s * 0.3);
+            ctx.translate(s * 0.5, s * 0.45);
             ctx.rotate(-0.7);
-            ctx.fillRect(-s * 0.35, -s * 0.06, s * 0.7, s * 0.12);
-            // Tips
+            ctx.fillStyle = '#666';
+            ctx.fillRect(-s * 0.35, -s * 0.07, s * 0.7, s * 0.14);
+
+            // Left spike
             ctx.fillStyle = '#555';
             ctx.beginPath();
-            ctx.moveTo(-s * 0.35, -s * 0.06);
-            ctx.lineTo(-s * 0.42, s * 0.04);
-            ctx.lineTo(-s * 0.35, s * 0.06);
+            ctx.moveTo(-s * 0.35, -s * 0.07);
+            ctx.lineTo(-s * 0.52, 0);
+            ctx.lineTo(-s * 0.35, s * 0.07);
+            ctx.closePath();
             ctx.fill();
+
+            // Right spike
             ctx.beginPath();
-            ctx.moveTo(s * 0.35, -s * 0.06);
-            ctx.lineTo(s * 0.42, s * 0.04);
-            ctx.lineTo(s * 0.35, s * 0.06);
+            ctx.moveTo(s * 0.35, -s * 0.07);
+            ctx.lineTo(s * 0.52, 0);
+            ctx.lineTo(s * 0.35, s * 0.07);
+            ctx.closePath();
             ctx.fill();
+
+            // Center reinforcement
+            ctx.fillStyle = '#777';
+            ctx.fillRect(-s * 0.02, -s * 0.07, s * 0.04, s * 0.14);
+
+            // Edge shine
+            ctx.fillStyle = '#888';
+            ctx.fillRect(-s * 0.04, -s * 0.02, s * 0.08, s * 0.04);
+            ctx.restore();
             ctx.restore();
         });
 
         this._createSprite('sword', (ctx, s) => {
+            ctx.save();
+            ctx.translate(s, 0);
+            ctx.rotate(Math.PI / 2);
+
             // Blade
             ctx.fillStyle = '#C0C0C0';
             ctx.save();
@@ -106,6 +132,7 @@ const Sprites = {
             ctx.beginPath();
             ctx.arc(0, s * 0.4, s * 0.05, 0, Math.PI * 2);
             ctx.fill();
+            ctx.restore();
             ctx.restore();
         });
 
@@ -758,5 +785,137 @@ const Sprites = {
         if (sprite) {
             ctx.drawImage(sprite, x, y, size, size);
         }
+    },
+
+    // === SPRITE SHEET SYSTEM ===
+
+    /**
+     * Loads all sprite sheets defined in CONFIG.ENEMIES.TYPES.
+     * Any enemy type with a `spriteSheet` property will be loaded automatically.
+     */
+    _loadSpriteSheets() {
+        const types = CONFIG.ENEMIES.TYPES;
+        for (const [id, def] of Object.entries(types)) {
+            if (def.spriteSheet) {
+                this.loadSpriteSheet(id, def.spriteSheet);
+            }
+        }
+        // Load player sprite sheet
+        if (CONFIG.PLAYER.SPRITE_SHEET) {
+            this.loadSpriteSheet('player_sheet', CONFIG.PLAYER.SPRITE_SHEET);
+        }
+    },
+
+    /**
+     * Determines the correct frame index for the player based on state.
+     */
+    getPlayerFrame(player) {
+        const sheet = this.spriteSheets['player_sheet'];
+        if (!sheet) return 0;
+
+        const anims = sheet.animations;
+
+        // Attacking (use Input if available)
+        const attacking = (typeof Input !== 'undefined' && Input.isAttack && Input.isAttack());
+        if (attacking && anims.attack && anims.attack.length > 0) {
+            const attackFrames = anims.attack;
+            const progress = (Date.now() % 400) / 400;
+            const idx = Math.min(Math.floor(progress * attackFrames.length), attackFrames.length - 1);
+            return attackFrames[idx];
+        }
+
+        // Walking (player.vx !== 0)
+        const moving = player.vx !== 0;
+        if (moving && anims.walk && anims.walk.length > 0) {
+            const walkFrames = anims.walk;
+            const cycleTime = 300;
+            const idx = Math.floor((Date.now() / cycleTime) % walkFrames.length);
+            return walkFrames[idx];
+        }
+
+        // Idle
+        const idleFrames = anims.idle || [0];
+        if (idleFrames.length === 1) return idleFrames[0];
+        const cycleTime = 500;
+        const idx = Math.floor((Date.now() / cycleTime) % idleFrames.length);
+        return idleFrames[idx];
+    },
+
+    /**
+     * Loads a single sprite sheet.
+     * @param {string} name - Unique identifier (matches enemy id or entity id).
+     * @param {object} opts - { src, frameWidth, frameHeight, columns, rows, animations }.
+     *   animations is an object like { idle: [0], attack: [1, 2] }
+     */
+    loadSpriteSheet(name, opts) {
+        const img = new Image();
+        img.src = opts.src;
+        const entry = {
+            image: img,
+            loaded: false,
+            frameWidth: opts.frameWidth,
+            frameHeight: opts.frameHeight,
+            columns: opts.columns,
+            rows: opts.rows,
+            animations: opts.animations || { idle: [0] },
+        };
+        img.onload = () => { entry.loaded = true; };
+        this.spriteSheets[name] = entry;
+    },
+
+    /**
+     * Returns sprite sheet metadata, or null if not registered.
+     */
+    getSpriteSheet(name) {
+        return this.spriteSheets[name] || null;
+    },
+
+    /**
+     * Draws a specific frame from a sprite sheet.
+     * @returns {boolean} true if drawn successfully, false otherwise.
+     */
+    drawSpriteSheetFrame(ctx, name, frameIndex, x, y, width, height, flipX) {
+        const sheet = this.spriteSheets[name];
+        if (!sheet || !sheet.loaded) return false;
+
+        const col = frameIndex % sheet.columns;
+        const row = Math.floor(frameIndex / sheet.columns);
+        const sx = col * sheet.frameWidth;
+        const sy = row * sheet.frameHeight;
+
+        ctx.save();
+        if (flipX) {
+            ctx.translate(x + width, y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(sheet.image, sx, sy, sheet.frameWidth, sheet.frameHeight, 0, 0, width, height);
+        } else {
+            ctx.drawImage(sheet.image, sx, sy, sheet.frameWidth, sheet.frameHeight, x, y, width, height);
+        }
+        ctx.restore();
+        return true;
+    },
+
+    /**
+     * Determines the correct frame index for an enemy based on its state.
+     * Uses attackCooldown to decide between idle and attack animations.
+     */
+    getEnemyFrame(enemy) {
+        const sheet = this.spriteSheets[enemy.id];
+        if (!sheet) return 0;
+
+        const anims = sheet.animations;
+        if (enemy.attackCooldown > 0 && anims.attack && anims.attack.length > 0) {
+            const attackFrames = anims.attack;
+            const progress = 1 - (enemy.attackCooldown / 1000);
+            const idx = Math.min(Math.floor(progress * attackFrames.length), attackFrames.length - 1);
+            return attackFrames[idx];
+        }
+
+        const idleFrames = anims.idle || [0];
+        if (idleFrames.length === 1) return idleFrames[0];
+
+        const cycleTime = 400;
+        const idx = Math.floor((Date.now() / cycleTime) % idleFrames.length);
+        return idleFrames[idx];
     },
 };
