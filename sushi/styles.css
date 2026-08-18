@@ -1,0 +1,596 @@
+:root {
+  --color-primary: #FF6B3D;
+  --color-accent-1: #4ECDC4;
+  --color-accent-2: #FFE66D;
+  --color-accent-3: #36a64d;
+  --color-accent-4: #c889b5;
+  --color-error: #E74C3C;
+  --color-dark: #1A1A1A;
+  --color-light: #F5F5F5;
+  --color-white: #FFFFFF;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: var(--color-dark);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+/* ===== Screens ===== */
+.screen {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.screen.active {
+  display: flex;
+  animation: fadeIn 0.28s ease;
+}
+
+.overlay-screen.active {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.55);
+  z-index: 20;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  background: var(--color-white);
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  padding: 32px 28px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ===== Menu ===== */
+.title {
+  font-size: 2.4rem;
+  margin: 0 0 4px;
+  color: var(--color-primary);
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  margin: 0 0 20px;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.current-char-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-light);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.current-char-badge .change-char-link {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.level-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.level-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--color-light);
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  text-align: left;
+}
+
+.level-item:hover:not(.locked) {
+  border-color: var(--color-accent-1);
+  transform: translateY(-2px);
+}
+
+.level-item.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.level-item .level-name {
+  font-weight: 700;
+}
+
+.level-item .level-meta {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.level-item .level-icon {
+  font-size: 1.6rem;
+}
+
+.menu-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.wip-note {
+  margin-top: 18px;
+  font-size: 0.75rem;
+  color: #999;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-secondary {
+  background: var(--color-light);
+  color: var(--color-dark);
+}
+
+.btn-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.stack-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn-icon.godmode-active {
+  background: linear-gradient(135deg, #FFE66D, #D4AF37);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.5);
+}
+
+/* ===== Modo Dios ===== */
+.godmode-desc {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0 0 16px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid var(--color-light);
+  background: var(--color-light);
+  font-size: 1rem;
+  font-family: inherit;
+  text-align: center;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.godmode-error {
+  color: var(--color-error);
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 10px 0 0;
+}
+
+/* ===== Game screen ===== */
+#screen-game {
+  flex-direction: column;
+  padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.progress-track {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-primary);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.game-hud {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.hud-left {
+  display: flex;
+  gap: 16px;
+}
+
+.hud-right {
+  display: flex;
+  gap: 8px;
+}
+
+.canvas-wrap {
+  position: relative;
+  /* El ancho se limita también por la altura disponible (100vh menos la
+     barra de progreso + cabecera, ~84px) para que el canvas entero quepa
+     siempre en una pantalla sin recortarse ni exigir scroll — clave en
+     ventanas bajas o móvil en horizontal, donde limitar solo por ancho
+     dejaba la parte de abajo del nivel fuera de la vista. */
+  width: min(100%, 900px, calc((100vh - 84px) * 900 / 380));
+  width: min(100%, 900px, calc((100dvh - 84px) * 900 / 380));
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  flex-shrink: 0;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #cdefff;
+}
+
+.flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--color-error);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.08s ease;
+}
+
+.flash-overlay.show {
+  opacity: 0.55;
+}
+
+/* Botón de la habilidad del Ramen (equivalente táctil de la tecla S):
+   flotante sobre el canvas, solo visible cuando el personaje equipado
+   puede eliminar obstáculos. */
+.ability-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+
+.ability-btn:active {
+  transform: scale(0.94);
+}
+
+.ability-btn:disabled {
+  opacity: 0.4;
+}
+
+.ability-charges {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Selección de personaje ===== */
+.char-select-card {
+  max-width: 640px;
+}
+
+.char-select-body {
+  display: flex;
+  gap: 16px;
+  text-align: left;
+  margin-top: 16px;
+}
+
+.char-list {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.char-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-light);
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.char-item.active {
+  border-color: var(--color-accent-1);
+}
+
+.char-item.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.char-item-icon {
+  font-size: 1.4rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.char-item-canvas {
+  width: 32px;
+  height: 32px;
+}
+
+.char-item-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.char-item-equipped {
+  font-size: 0.7rem;
+  color: var(--color-accent-3);
+  font-weight: 700;
+}
+
+.char-detail {
+  flex: 1;
+  background: var(--color-light);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.char-detail-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  overflow: hidden;
+}
+
+.char-detail-icon canvas {
+  width: 58px;
+  height: 58px;
+}
+
+.char-detail h3 {
+  margin: 0 0 6px;
+}
+
+.char-detail-desc {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0 0 12px;
+}
+
+.char-detail-stats {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.char-detail-stats li {
+  display: flex;
+  justify-content: space-between;
+  background: var(--color-white);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-small {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+@media (max-width: 600px) {
+  .char-select-body {
+    flex-direction: column;
+  }
+  .char-list {
+    max-height: 160px;
+  }
+}
+
+/* ===== Instructions / pause / level complete ===== */
+.instructions-list {
+  text-align: left;
+  padding-left: 20px;
+  line-height: 1.5;
+}
+
+.lc-stat {
+  margin: 4px 0;
+  color: #555;
+}
+
+.lc-unlock {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--color-light);
+  border-radius: 14px;
+}
+
+.lc-unlock-label {
+  font-weight: 700;
+  color: var(--color-accent-3);
+  margin: 0 0 8px;
+}
+
+.lc-unlock-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.lc-unlock-item {
+  flex: 0 1 130px;
+}
+
+.unlock-sprite {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.unlock-sprite canvas {
+  width: 44px;
+  height: 44px;
+}
+
+.lc-unlock-name {
+  font-weight: 700;
+  margin: 0;
+}
+
+.lc-unlock-desc {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 4px 0 0;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .card {
+    padding: 24px 18px;
+  }
+  .title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-hud {
+    font-size: 0.78rem;
+  }
+  .hud-left {
+    gap: 10px;
+  }
+}

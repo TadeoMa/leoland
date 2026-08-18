@@ -29,6 +29,12 @@ const projects = [
     enlace: "minimine/index.html",
     enable: true
   },
+  {
+    nombre: "Sushi Family",
+    imagen: "img/projects/placeholder.svg",
+    enlace: "sushi/index.html",
+    enable: true
+  },
   // {
   //   nombre: "Juego Espacial",
   //   imagen: "img/projects/space.gif",

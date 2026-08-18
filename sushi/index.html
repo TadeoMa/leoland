@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sushi Family</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="screen-menu" class="screen active">
+  <div class="card menu-card">
+    <h1 class="title">SUSHI FAMILY</h1>
+    <p class="subtitle">Salta, esquiva y conviértete en el mejor sushi del restaurante</p>
+
+    <div id="currentCharBadge" class="current-char-badge"></div>
+
+    <div id="levelList" class="level-list"></div>
+
+    <div class="menu-buttons">
+      <button id="btnCharacters" class="btn btn-secondary">Personajes</button>
+      <button id="btnEvents" class="btn btn-secondary">Eventos</button>
+      <button id="btnInstructions" class="btn btn-secondary">Instrucciones</button>
+      <button id="btnMute" class="btn btn-secondary">Sonido: ON</button>
+      <button id="btnGodMode" class="btn btn-icon" aria-label="Modo Dios" title="Modo Dios">👑</button>
+    </div>
+
+    <p class="wip-note">Prototipo básico — se irán añadiendo más tipos de sushi, niveles y enemigos.</p>
+  </div>
+</div>
+
+<div id="screen-game" class="screen">
+  <div class="progress-track">
+    <div id="progressFill" class="progress-fill"></div>
+  </div>
+  <div class="game-hud">
+    <div class="hud-left">
+      <span id="hudLevelName">Nivel 1</span>
+      <span id="hudAttempts">Intentos: 0</span>
+    </div>
+    <div class="hud-right">
+      <button id="btnPause" class="btn btn-icon" aria-label="Pausa">⏸</button>
+      <button id="btnMenuFromGame" class="btn btn-icon" aria-label="Menú">✕</button>
+    </div>
+  </div>
+  <div class="canvas-wrap">
+    <canvas id="gameCanvas"></canvas>
+    <div id="flashOverlay" class="flash-overlay"></div>
+    <button id="btnAbility" class="ability-btn" style="display:none;" aria-label="Eliminar obstáculo" title="Eliminar el próximo obstáculo">
+      🍜<span id="abilityCharges" class="ability-charges"></span>
+    </button>
+  </div>
+</div>
+
+<div id="screen-pause" class="screen overlay-screen">
+  <div class="card">
+    <h2>PAUSA</h2>
+    <div class="stack-buttons">
+      <button id="btnResume" class="btn btn-primary">Reanudar</button>
+      <button id="btnRestartLevel" class="btn btn-secondary">Reiniciar nivel</button>
+      <button id="btnPauseInstructions" class="btn btn-secondary">Instrucciones</button>
+      <button id="btnPauseMenu" class="btn btn-secondary">Menú</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-levelcomplete" class="screen overlay-screen">
+  <div class="card">
+    <h2>¡Nivel superado!</h2>
+    <p id="lcTime" class="lc-stat"></p>
+    <p id="lcAttempts" class="lc-stat"></p>
+    <div id="lcUnlock" class="lc-unlock" style="display:none;">
+      <p id="lcUnlockLabel" class="lc-unlock-label">¡Nuevo sushi desbloqueado!</p>
+      <div id="lcUnlockList" class="lc-unlock-list"></div>
+      <button id="btnViewCharactersFromWin" class="btn btn-secondary btn-small">Ver personajes</button>
+    </div>
+    <div class="stack-buttons">
+      <button id="btnRetryLevel" class="btn btn-secondary">Repetir nivel</button>
+      <button id="btnNextOrMenu" class="btn btn-primary">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-characters" class="screen overlay-screen">
+  <div class="card char-select-card">
+    <h2>Elige tu sushi</h2>
+    <div class="char-select-body">
+      <div id="charList" class="char-list"></div>
+      <div class="char-detail">
+        <div class="char-detail-icon"><canvas id="charDetailCanvas" width="140" height="140"></canvas></div>
+        <h3 id="charDetailName"></h3>
+        <p id="charDetailDesc" class="char-detail-desc"></p>
+        <ul id="charDetailStats" class="char-detail-stats"></ul>
+      </div>
+    </div>
+    <div class="stack-buttons">
+      <button id="btnEquipCharacter" class="btn btn-primary">Usar este personaje</button>
+      <button id="btnCloseCharacters" class="btn btn-secondary">Volver al menú</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-events" class="screen overlay-screen">
+  <div class="card">
+    <h2>Eventos</h2>
+    <p class="godmode-desc">Partidas especiales, siempre disponibles desde el principio: no hace falta desbloquearlas completando la campaña. Supéralas para ganar un personaje que no forma parte de la progresión normal.</p>
+    <div id="eventList" class="level-list"></div>
+    <div class="stack-buttons">
+      <button id="btnCloseEvents" class="btn btn-secondary">Volver al menú</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-godmode" class="screen overlay-screen">
+  <div class="card">
+    <h2>👑 Modo Dios</h2>
+    <p class="godmode-desc">Introduce la contraseña para desbloquear todos los niveles y personajes (sin tocar tu progreso real).</p>
+    <input type="password" id="godModePasswordInput" class="text-input" placeholder="Contraseña" autocomplete="off">
+    <p id="godModeError" class="godmode-error" style="display:none;">Contraseña incorrecta.</p>
+    <div class="stack-buttons">
+      <button id="btnGodModeSubmit" class="btn btn-primary">Activar</button>
+      <button id="btnGodModeCancel" class="btn btn-secondary">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-instructions" class="screen overlay-screen">
+  <div class="card">
+    <h2>Instrucciones</h2>
+    <ol class="instructions-list">
+      <li>Toca la pantalla, haz clic o pulsa <strong>Espacio</strong> para saltar.</li>
+      <li>El sushi avanza solo: tu trabajo es esquivar el wasabi y no caer en los charcos de salsa de soja.</li>
+      <li>Pulsa <strong>A</strong> para parar el avance en seco, y vuelve a pulsarla para continuar. Útil para pensar el siguiente salto con calma.</li>
+      <li>Algunos personajes (los maki) pueden acelerar manteniendo pulsada <strong>D</strong>. Ojo: acelerar deja menos margen para aterrizar antes del siguiente obstáculo.</li>
+      <li>Al terminar un nivel desbloqueas un nuevo tipo de sushi. Elige cuál usar desde "Personajes" en el menú: no tiene por qué ser el último que hayas desbloqueado.</li>
+      <li>Hay erizos flotando en el aire: si saltas y los tocas, mueres. Si no saltas cerca de ellos, pasas por debajo sin problema.</li>
+      <li>En niveles avanzados aparece wasabi grande (un salto más exigente que el pincho normal).</li>
+      <li>Cada nivel termina en una caja de sushi de un color distinto: llega hasta ella para superar el nivel.</li>
+      <li>En "Eventos" hay partidas especiales que no dependen de la campaña: están disponibles desde el principio y, si las superas, ganas un personaje extra.</li>
+      <li>El Ramen puede eliminar el próximo obstáculo con la tecla <strong>S</strong> o el botón 🍜 en pantalla, hasta 3 veces por partida.</li>
+      <li>Las Bolas de pulpo apuntan manteniendo pulsada <strong>D</strong> (el retículo sigue al ratón) y se teletransportan hasta ese punto al soltarla, hasta 3 veces por partida — pero no dan ninguna protección extra: si apareces sobre un obstáculo, mueres igual que cualquiera.</li>
+      <li>El Arroz con pollo teriyaki puede crear una rampa de arroz con la tecla <strong>D</strong>, hasta 3 veces por partida: al llegar a ella hace un salto muy grande automáticamente.</li>
+    </ol>
+    <button id="btnCloseInstructions" class="btn btn-primary">Entendido</button>
+  </div>
+</div>
+
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
