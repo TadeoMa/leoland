@@ -31,7 +31,7 @@ const projects = [
   },
   {
     nombre: "Sushi Family",
-    imagen: "img/projects/placeholder.svg",
+    imagen: "img/projects/sushi.png",
     enlace: "sushi/index.html",
     enable: true
   },
