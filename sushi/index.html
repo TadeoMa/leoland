@@ -47,7 +47,7 @@
     <canvas id="gameCanvas"></canvas>
     <div id="flashOverlay" class="flash-overlay"></div>
     <button id="btnAbility" class="ability-btn" style="display:none;" aria-label="Eliminar obstáculo" title="Eliminar el próximo obstáculo">
-      🍜<span id="abilityCharges" class="ability-charges"></span>
+      <span id="abilityIcon">🍜</span><span id="abilityCharges" class="ability-charges"></span>
     </button>
   </div>
 </div>
@@ -131,15 +131,17 @@
       <li>Toca la pantalla, haz clic o pulsa <strong>Espacio</strong> para saltar.</li>
       <li>El sushi avanza solo: tu trabajo es esquivar el wasabi y no caer en los charcos de salsa de soja.</li>
       <li>Pulsa <strong>A</strong> para parar el avance en seco, y vuelve a pulsarla para continuar. Útil para pensar el siguiente salto con calma.</li>
-      <li>Algunos personajes (los maki) pueden acelerar manteniendo pulsada <strong>D</strong>. Ojo: acelerar deja menos margen para aterrizar antes del siguiente obstáculo.</li>
+      <li>Algunos personajes (los maki) pueden acelerar manteniendo pulsada <strong>D</strong> (en pantalla táctil, el botón flotante sobre el juego). Ojo: acelerar deja menos margen para aterrizar antes del siguiente obstáculo.</li>
       <li>Al terminar un nivel desbloqueas un nuevo tipo de sushi. Elige cuál usar desde "Personajes" en el menú: no tiene por qué ser el último que hayas desbloqueado.</li>
       <li>Hay erizos flotando en el aire: si saltas y los tocas, mueres. Si no saltas cerca de ellos, pasas por debajo sin problema.</li>
       <li>En niveles avanzados aparece wasabi grande (un salto más exigente que el pincho normal).</li>
       <li>Cada nivel termina en una caja de sushi de un color distinto: llega hasta ella para superar el nivel.</li>
       <li>En "Eventos" hay partidas especiales que no dependen de la campaña: están disponibles desde el principio y, si las superas, ganas un personaje extra.</li>
-      <li>El Ramen puede eliminar el próximo obstáculo con la tecla <strong>S</strong> o el botón 🍜 en pantalla, hasta 3 veces por partida.</li>
-      <li>Las Bolas de pulpo apuntan manteniendo pulsada <strong>D</strong> (el retículo sigue al ratón) y se teletransportan hasta ese punto al soltarla, hasta 3 veces por partida — pero no dan ninguna protección extra: si apareces sobre un obstáculo, mueres igual que cualquiera.</li>
-      <li>El Arroz con pollo teriyaki puede crear una rampa de arroz con la tecla <strong>D</strong>, hasta 3 veces por partida: al llegar a ella hace un salto muy grande automáticamente.</li>
+      <li>El Ramen puede eliminar el próximo obstáculo con la tecla <strong>D</strong> o el botón 🍜 en pantalla, hasta 3 veces por partida.</li>
+      <li>Los Fideos rápidos son más rápidos que el Ramen y saltan un poco menos (dando una vuelta en el aire), y tienen la misma habilidad (eliminar el próximo obstáculo con la tecla <strong>D</strong> o el botón 🍜), pero hasta 4 veces por partida en vez de 3.</li>
+      <li>La Gyoza se convierte en remolino durante 10 segundos con la tecla <strong>D</strong> o el botón 🌪️: los pinchos del suelo salen volando y caen más adelante. Solo se puede usar <strong>una vez</strong> y no se recupera al morir: los pinchos siguen donde cayeron. Para dejarlo todo como estaba, pulsa <strong>Escape</strong> y sal del nivel o reinícialo.</li>
+      <li>Las Bolas de pulpo apuntan manteniendo pulsada <strong>D</strong> o el botón en pantalla (el retículo sigue al ratón o al dedo) y se teletransportan hasta ese punto al soltarla, hasta 3 veces por partida — pero no dan ninguna protección extra: si apareces sobre un obstáculo, mueres igual que cualquiera.</li>
+      <li>El Arroz con pollo teriyaki puede crear una rampa de arroz con la tecla <strong>D</strong> o el botón en pantalla, hasta 3 veces por partida: al llegar a ella hace un salto muy grande automáticamente.</li>
     </ol>
     <button id="btnCloseInstructions" class="btn btn-primary">Entendido</button>
   </div>

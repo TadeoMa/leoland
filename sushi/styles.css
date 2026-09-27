@@ -323,7 +323,7 @@ button {
   opacity: 0.55;
 }
 
-/* Botón de la habilidad del Ramen (equivalente táctil de la tecla S):
+/* Botón de la habilidad del Ramen (equivalente táctil de la tecla D):
    flotante sobre el canvas, solo visible cuando el personaje equipado
    puede eliminar obstáculos. */
 .ability-btn {
@@ -340,6 +340,15 @@ button {
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 5;
+  /* Evita que arrastrar el dedo fuera del botón (p. ej. para apuntar el
+     teletransporte del Takoyaki) dispare gestos del navegador (scroll/zoom). */
+  touch-action: none;
+  /* Mantener pulsado (planear, acelerar, apuntar...) no debe abrir la
+     selección de texto ni el menú del móvil/tablet: eso corta la pulsación. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ability-btn:active {

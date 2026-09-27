@@ -74,6 +74,11 @@ class AudioManager {
     this.tone({ freq: 250, startFreq: 950, duration: 0.18, type: 'sine', gain: 0.2 });
   }
 
+  whirlwind() {
+    this.tone({ freq: 900, startFreq: 180, duration: 0.35, type: 'sawtooth', gain: 0.14 });
+    setTimeout(() => this.tone({ freq: 1400, startFreq: 400, duration: 0.3, type: 'triangle', gain: 0.12 }), 120);
+  }
+
   launch() {
     this.tone({ freq: 1100, startFreq: 320, duration: 0.2, type: 'sawtooth', gain: 0.2 });
   }

@@ -11,6 +11,21 @@ const PLAYER_SCREEN_X = 130;
 const GRAVITY = 2600;
 const JUMP_VELOCITY = -900;
 
+// Configuración del botón táctil de habilidad especial (equivalente en pantalla
+// de la tecla D) según la habilidad del personaje equipado. `hold: true` marca
+// las habilidades que en teclado se activan manteniendo pulsada D en vez de
+// con una única pulsación; `chargesKey` indica en qué propiedad de `currentLevel`
+// vive su contador de usos restantes (o null si la habilidad no gasta usos).
+const ABILITY_BUTTON_CONFIG = {
+  remove:     { icon: '🍜', label: 'Eliminar el próximo obstáculo', hold: false, chargesKey: 'removeCharges' },
+  ramp:       { icon: '🍱', label: 'Crear rampa de arroz',          hold: false, chargesKey: 'rampCharges' },
+  whirlwind:  { icon: '🌪️', label: 'Convertirse en remolino',       hold: false, chargesKey: 'whirlwindCharges' },
+  teleport:   { icon: '🐙', label: 'Mantén pulsado para apuntar, suelta para teletransportarte', hold: true, chargesKey: 'teleportCharges' },
+  glide:      { icon: '🪂', label: 'Mantén pulsado para planear',   hold: true, chargesKey: null },
+  accelerate: { icon: '⚡', label: 'Mantén pulsado para acelerar',  hold: true, chargesKey: null },
+  brake:      { icon: '🐌', label: 'Mantén pulsado para frenar',    hold: true, chargesKey: null },
+};
+
 /* ===== Catálogo de tipos de sushi (personajes jugables) ===== */
 const FOOD_TYPES = {
   nigiri: {
@@ -92,11 +107,11 @@ const FOOD_TYPES = {
     accelMultiplier: 1.15,
     bodyColor: '#FFFFFF',
     topColor: '#E8734A',
-    desc: 'Un maki normal y corriente. Mantén pulsada la tecla D para acelerar cuando quieras.',
+    desc: 'Un maki normal y corriente. Mantén pulsada la tecla D (o el botón en pantalla) para acelerar cuando quieras.',
     stats: [
       { label: 'Velocidad', value: 'Normal (acelera +15% con D)' },
       { label: 'Salto', value: 'Normal' },
-      { label: 'Habilidad especial', value: 'Acelerar (mantener pulsada D)' }
+      { label: 'Habilidad especial', value: 'Acelerar (mantener pulsada D o el botón en pantalla)' }
     ]
   },
   makiAdvanced: {
@@ -114,7 +129,7 @@ const FOOD_TYPES = {
     stats: [
       { label: 'Velocidad', value: 'Normal (acelera +20% con D)' },
       { label: 'Salto', value: 'Un poco más alto que el maki normal' },
-      { label: 'Habilidad especial', value: 'Acelerar más fuerte (mantener pulsada D)' }
+      { label: 'Habilidad especial', value: 'Acelerar más fuerte (mantener pulsada D o el botón en pantalla)' }
     ]
   },
   nigiriS: {
@@ -184,11 +199,11 @@ const FOOD_TYPES = {
     hasFace: true,
     bodyColor: '#FFFFFF',
     topColor: '#1A1A1A',
-    desc: 'Una bola de arroz mejorada: mantén pulsada D para frenar en vez de acelerar, justo al revés que la familia maki. Útil para calcular con calma los tramos más apretados.',
+    desc: 'Una bola de arroz mejorada: mantén pulsada D (o el botón en pantalla) para frenar en vez de acelerar, justo al revés que la familia maki. Útil para calcular con calma los tramos más apretados.',
     stats: [
       { label: 'Velocidad', value: 'Normal (frena -30% mientras se mantiene D)' },
       { label: 'Salto', value: 'Normal' },
-      { label: 'Habilidad especial', value: 'Frenar (mantener pulsada D) en vez de acelerar' }
+      { label: 'Habilidad especial', value: 'Frenar (mantener pulsada D o el botón en pantalla) en vez de acelerar' }
     ]
   },
   wasabi: {
@@ -240,11 +255,11 @@ const FOOD_TYPES = {
     hasFace: true,
     bodyColor: '#F0C05A',
     topColor: '#D9863C',
-    desc: 'Dos trozos de tempura pegados el uno al otro. Tras saltar, mantén pulsada la tecla D para planear en el aire hasta 3 segundos antes de empezar a caer. Sin recarga: cada vez que vuelves a tocar el suelo y saltas, tienes los 3 segundos enteros otra vez.',
+    desc: 'Dos trozos de tempura pegados el uno al otro. Tras saltar, mantén pulsada la tecla D (o el botón en pantalla) para planear en el aire hasta 3 segundos antes de empezar a caer. Sin recarga: cada vez que vuelves a tocar el suelo y saltas, tienes los 3 segundos enteros otra vez.',
     stats: [
       { label: 'Velocidad', value: 'Normal' },
       { label: 'Salto', value: 'Normal' },
-      { label: 'Habilidad especial', value: 'Planear en el aire hasta 3s manteniendo D (sin recarga: se renueva cada vez que saltas)' }
+      { label: 'Habilidad especial', value: 'Planear en el aire hasta 3s manteniendo D o el botón en pantalla (sin recarga: se renueva cada vez que saltas)' }
     ]
   },
   chopstick: {
@@ -279,11 +294,56 @@ const FOOD_TYPES = {
     hasFace: true,
     bodyColor: '#D9861C',
     topColor: '#F5E3A0',
-    desc: 'Un tazón de ramen humeante, tan rápido como el nigiri de pez mantequilla. Pulsa S (o el botón 🍜 en pantalla) para eliminar de golpe el próximo obstáculo que tengas por delante — hasta 3 veces por partida.',
+    desc: 'Un tazón de ramen humeante, tan rápido como el nigiri de pez mantequilla. Pulsa D (o el botón 🍜 en pantalla) para eliminar de golpe el próximo obstáculo que tengas por delante — hasta 3 veces por partida.',
     stats: [
       { label: 'Velocidad', value: '+20% más rápido que el nigiri (igual que el nigiri de pez mantequilla)' },
       { label: 'Salto', value: 'Normal' },
-      { label: 'Habilidad especial', value: 'Eliminar el siguiente obstáculo (tecla S o botón 🍜): hasta 3 veces por partida' }
+      { label: 'Habilidad especial', value: 'Eliminar el siguiente obstáculo (tecla D o botón 🍜): hasta 3 veces por partida' }
+    ]
+  },
+  quickNoodles: {
+    id: 'quickNoodles',
+    name: 'Fideos rápidos',
+    icon: '🍜',
+    shape: 'quickNoodles',
+    speedMultiplier: 1.3,
+    // Salto algo más bajo que el normal, pero no tanto como para no poder
+    // subir a las plataformas elevadas (130px): con 0.94 el salto sube ~138px.
+    jumpMultiplier: 0.94,
+    canAccelerate: false,
+    canRemoveObstacles: true,
+    removeCharges: 4, // uno más que el Ramen
+    spinOnJump: true,
+    hasFace: true,
+    bodyColor: '#FFFFFF',
+    topColor: '#F2C94C',
+    desc: 'Un vaso de fideos instantáneos, todavía más rápido que el Ramen. No salta tan alto, pero cada vez que salta da una vuelta completa en el aire. Igual que el Ramen, pulsa D (o el botón 🍜 en pantalla) para eliminar de golpe el próximo obstáculo que tengas por delante, pero puede hacerlo hasta 4 veces por partida (una más que el Ramen).',
+    stats: [
+      { label: 'Velocidad', value: '+30% más rápido que el nigiri (más que el Ramen)' },
+      { label: 'Salto', value: 'Un poco más bajo que el normal, y da una vuelta en el aire' },
+      { label: 'Habilidad especial', value: 'Eliminar el siguiente obstáculo (tecla D o botón 🍜): hasta 4 veces por partida (el Ramen, solo 3)' }
+    ]
+  },
+  gyoza: {
+    id: 'gyoza',
+    name: 'Gyoza',
+    icon: '🥟',
+    shape: 'gyoza',
+    speedMultiplier: 1,
+    jumpMultiplier: 1,
+    canAccelerate: false,
+    canWhirlwind: true,
+    whirlwindCharges: 1,
+    whirlwindDuration: 10,
+    hasFace: true,
+    bodyColor: '#F7EBD3',
+    topColor: '#C9803A',
+    desc: 'Una empanadilla gyoza con la base tostadita. Pulsa D (o el botón 🌪️ en pantalla) para convertirte en un remolino durante 10 segundos: los pinchos del suelo que se acerquen salen volando y caen más adelante, en otro sitio. Solo se puede hacer UNA vez, y no se recupera al morir: si mueres, sigues sin remolino y los pinchos siguen donde cayeron, lo que puede complicarte el nivel. Para deshacerlo todo tienes que salir del nivel (Escape → Salir o Reiniciar) y volver a entrar.',
+    stats: [
+      { label: 'Velocidad', value: 'Normal' },
+      { label: 'Salto', value: 'Normal' },
+      { label: 'Habilidad especial', value: 'Remolino de 10 s (tecla D o botón 🌪️) que hace salir volando a los pinchos del suelo: solo 1 vez' },
+      { label: 'Debilidad', value: 'El remolino no vuelve al morir, y los pinchos que ha movido se quedan donde cayeron hasta que salgas del nivel y vuelvas a entrar' }
     ]
   },
   teriyakiRice: {
@@ -299,11 +359,11 @@ const FOOD_TYPES = {
     hasFace: true,
     bodyColor: '#FFFFFF',
     topColor: '#7A3B12',
-    desc: 'Un plato de arroz blanco con trozos de pollo teriyaki caramelizado, sésamo y un poco de cebolleta por encima. Pulsa la tecla D para crear una rampa de arroz un poco por delante: al llegar a ella hace un salto muy grande automáticamente. Solo se puede hacer 3 veces por partida.',
+    desc: 'Un plato de arroz blanco con trozos de pollo teriyaki caramelizado, sésamo y un poco de cebolleta por encima. Pulsa la tecla D (o el botón en pantalla) para crear una rampa de arroz un poco por delante: al llegar a ella hace un salto muy grande automáticamente. Solo se puede hacer 3 veces por partida.',
     stats: [
       { label: 'Velocidad', value: 'Normal' },
       { label: 'Salto', value: 'Normal' },
-      { label: 'Habilidad especial', value: 'Crear una rampa de arroz (tecla D) que da un salto muy grande al llegar a ella: hasta 3 veces por partida' }
+      { label: 'Habilidad especial', value: 'Crear una rampa de arroz (tecla D o botón en pantalla) que da un salto muy grande al llegar a ella: hasta 3 veces por partida' }
     ]
   },
   takoyaki: {
@@ -319,11 +379,11 @@ const FOOD_TYPES = {
     hasFace: true,
     bodyColor: '#C98A3B',
     topColor: '#8B5A2B',
-    desc: 'Una bola de takoyaki en un palillo. Mantén pulsada la tecla D para apuntar (el retículo sigue al ratón) y suéltala para teletransportarte hasta ese punto, atravesando cualquier obstáculo que hubiera en el camino. Solo se puede hacer 3 veces por partida. Ojo: teletransportarte no te protege de nada. Si apareces justo encima de un obstáculo, mueres igual que cualquier otro sushi.',
+    desc: 'Una bola de takoyaki en un palillo. Mantén pulsada la tecla D para apuntar (el retículo sigue al ratón) y suéltala para teletransportarte hasta ese punto, atravesando cualquier obstáculo que hubiera en el camino. En pantalla táctil, mantén pulsado el botón y arrastra el dedo para apuntar. Solo se puede hacer 3 veces por partida. Ojo: teletransportarte no te protege de nada. Si apareces justo encima de un obstáculo, mueres igual que cualquier otro sushi.',
     stats: [
       { label: 'Velocidad', value: 'Normal' },
       { label: 'Salto', value: 'Normal' },
-      { label: 'Habilidad especial', value: 'Teletransportarse (mantén D, apunta con el ratón, suelta para transportarte): hasta 3 veces por partida' },
+      { label: 'Habilidad especial', value: 'Teletransportarse (mantén D y apunta con el ratón, o mantén el botón en pantalla y arrastra el dedo): hasta 3 veces por partida' },
       { label: 'Debilidad', value: 'Ninguna protección extra: aparecer justo sobre un obstáculo mata igual que a cualquier otro personaje' }
     ]
   }
@@ -1658,6 +1718,174 @@ const LEVELS = [
       { x: 43025, type: 'spike' },
       { x: 43275, type: 'bigspike' }
     ]
+  },
+  {
+    id: 'level14',
+    name: 'Nivel 14 · Fideos a toda prisa',
+    baseScrollSpeed: 300,
+    length: 12368,
+    unlocksFood: 'quickNoodles',
+    theme: 'ramen',
+    goalColor: '#E84A3C',
+    // Nivel 14: paisaje del cuenco de ramen, sin pincho de techo ni plataforma.
+    // Todas las distancias entre obstáculos consecutivos están copiadas de los
+    // Eventos ya validados a baseScrollSpeed 300 ("Tormenta de arroz", "Bolas
+    // de pulpo", "La carrera de la soja"), solo que en un orden nuevo y con
+    // racimos de erizos/guindillas más largos.
+    obstacles: [
+      { x: 560, type: 'spike' },
+      { x: 820, type: 'spike' },
+      { x: 1110, type: 'gap', width: 100 },
+      { x: 1470, type: 'bigspike' },
+      { x: 1780, type: 'enemy' },
+      { x: 1844, type: 'enemy' },
+      { x: 2144, type: 'spike' },
+      { x: 2434, type: 'spike' },
+      { x: 2724, type: 'gap', width: 90 },
+      { x: 3074, type: 'bigspike' },
+      { x: 3384, type: 'spike' },
+      { x: 3644, type: 'spike' },
+      { x: 3934, type: 'enemy' },
+      { x: 3998, type: 'enemy' },
+      { x: 4062, type: 'enemy' },
+      { x: 4362, type: 'gap', width: 110 },
+      { x: 4732, type: 'bigspike' },
+      { x: 5042, type: 'enemy' },
+      { x: 5106, type: 'enemy' },
+      { x: 5170, type: 'enemy' },
+      { x: 5234, type: 'enemy' },
+      { x: 5534, type: 'spike' },
+      { x: 5824, type: 'spike' },
+      { x: 6084, type: 'spike' },
+      { x: 6374, type: 'gap', width: 90 },
+      { x: 6724, type: 'bigspike' },
+      { x: 7034, type: 'spike' },
+      { x: 7324, type: 'gap', width: 100 },
+      { x: 7684, type: 'bigspike' },
+      { x: 7994, type: 'enemy' },
+      { x: 8058, type: 'enemy' },
+      { x: 8122, type: 'enemy' },
+      { x: 8422, type: 'spike' },
+      { x: 8682, type: 'spike' },
+      { x: 8992, type: 'bigspike' },
+      { x: 9302, type: 'spike' },
+      { x: 9592, type: 'enemy' },
+      { x: 9656, type: 'enemy' },
+      { x: 9720, type: 'enemy' },
+      { x: 9784, type: 'enemy' },
+      { x: 9848, type: 'enemy' },
+      { x: 10148, type: 'gap', width: 100 },
+      { x: 10508, type: 'bigspike' },
+      { x: 10818, type: 'spike' },
+      { x: 11078, type: 'spike' },
+      { x: 11368, type: 'gap', width: 90 },
+      { x: 11718, type: 'bigspike' }
+    ]
+  },
+  {
+    id: 'level15',
+    name: 'Nivel 15 · Ventisca',
+    baseScrollSpeed: 330,
+    length: 27240,
+    unlocksFood: 'gyoza',
+    theme: 'snow',
+    goalColor: '#5B8FD6',
+    // Más difícil que el Nivel 14: vuelve a baseScrollSpeed 330 e incluye pinchos
+    // de techo (7) y plataformas elevadas (2). Está hecho con tramos copiados
+    // tal cual (mismas coordenadas relativas) del Evento "Ramen extremo", que a
+    // su vez vienen de los Niveles 7 y 10, en un orden nuevo y con dos tramos
+    // repetidos, separados siempre por 420px de suelo llano. Validado con una
+    // simulación física completa a 60 y 120 fps para todo el roster.
+    obstacles: [
+      { x: 560, type: 'spike' },
+      { x: 860, type: 'spike' },
+      { x: 1180, type: 'gap', width: 100 },
+      { x: 1570, type: 'bigspike' },
+      { x: 1890, type: 'enemy' },
+      { x: 1954, type: 'enemy' },
+      { x: 2414, type: 'ceilspike' },
+      { x: 2804, type: 'gap', width: 100 },
+      { x: 3194, type: 'enemy' },
+      { x: 3258, type: 'enemy' },
+      { x: 3322, type: 'enemy' },
+      { x: 3652, type: 'spike' },
+      { x: 3952, type: 'bigspike' },
+      { x: 4272, type: 'gap', width: 110 },
+      { x: 4802, type: 'spike' },
+      { x: 5062, type: 'spike' },
+      { x: 5392, type: 'ceilspike' },
+      { x: 5782, type: 'gap', width: 100 },
+      { x: 6172, type: 'bigspike' },
+      { x: 6642, type: 'enemy' },
+      { x: 6706, type: 'enemy' },
+      { x: 6770, type: 'enemy' },
+      { x: 6834, type: 'enemy' },
+      { x: 6898, type: 'enemy' },
+      { x: 7358, type: 'bigspike' },
+      { x: 7758, type: 'platform' },
+      { x: 8238, type: 'spike' },
+      { x: 8618, type: 'bigspike' },
+      { x: 8910, type: 'spike' },
+      { x: 9159, type: 'spike' },
+      { x: 9509, type: 'bigspike' },
+      { x: 9790, type: 'spike' },
+      { x: 10240, type: 'enemy' },
+      { x: 10304, type: 'enemy' },
+      { x: 10368, type: 'enemy' },
+      { x: 10698, type: 'spike' },
+      { x: 10958, type: 'spike' },
+      { x: 11278, type: 'gap', width: 90 },
+      { x: 11658, type: 'bigspike' },
+      { x: 11958, type: 'bigspike' },
+      { x: 12428, type: 'gap', width: 90 },
+      { x: 12818, type: 'ceilspike' },
+      { x: 13208, type: 'gap', width: 100 },
+      { x: 13608, type: 'ceilspike' },
+      { x: 13998, type: 'bigspike' },
+      { x: 14468, type: 'enemy' },
+      { x: 14532, type: 'enemy' },
+      { x: 14596, type: 'enemy' },
+      { x: 14660, type: 'enemy' },
+      { x: 14970, type: 'spike' },
+      { x: 15230, type: 'spike' },
+      { x: 15490, type: 'bigspike' },
+      { x: 15840, type: 'ceilspike' },
+      { x: 16230, type: 'bigspike' },
+      { x: 16550, type: 'gap', width: 90 },
+      { x: 17060, type: 'ceilspike' },
+      { x: 17450, type: 'spike' },
+      { x: 17742, type: 'gap', width: 110 },
+      { x: 18152, type: 'bigspike' },
+      { x: 18426, type: 'spike' },
+      { x: 18714, type: 'enemy' },
+      { x: 18778, type: 'enemy' },
+      { x: 19238, type: 'enemy' },
+      { x: 19302, type: 'enemy' },
+      { x: 19632, type: 'spike' },
+      { x: 19892, type: 'spike' },
+      { x: 20152, type: 'spike' },
+      { x: 20452, type: 'bigspike' },
+      { x: 20752, type: 'gap', width: 100 },
+      { x: 21102, type: 'bigspike' },
+      { x: 21572, type: 'spike' },
+      { x: 21832, type: 'spike' },
+      { x: 22162, type: 'ceilspike' },
+      { x: 22552, type: 'gap', width: 100 },
+      { x: 22942, type: 'bigspike' },
+      { x: 23412, type: 'enemy' },
+      { x: 23476, type: 'enemy' },
+      { x: 23540, type: 'enemy' },
+      { x: 23604, type: 'enemy' },
+      { x: 23668, type: 'enemy' },
+      { x: 24128, type: 'bigspike' },
+      { x: 24528, type: 'platform' },
+      { x: 25008, type: 'spike' },
+      { x: 25388, type: 'bigspike' },
+      { x: 25680, type: 'spike' },
+      { x: 25929, type: 'spike' },
+      { x: 26279, type: 'bigspike' },
+      { x: 26560, type: 'spike' }
+    ]
   }
 ];
 
@@ -2001,6 +2229,14 @@ const RAMP_H = 60;
 const RAMP_PLACE_OFFSET = 260; // distancia por delante del jugador a la que aparece al crearla
 const RAMP_LAUNCH_VELOCITY = -1500; // muy por encima de JUMP_VELOCITY (-900): "un salto muy grande"
 
+// Remolino de la Gyoza: los pinchos del suelo que entren en su alcance salen
+// volando y aterrizan más adelante, en otro sitio del nivel.
+const WHIRLWIND_REACH = 230;         // px por delante del jugador a los que "alcanza" el remolino
+const WHIRLWIND_FLIGHT_TIME = 1.1;   // s que tarda un pincho en caer de nuevo al suelo
+const WHIRLWIND_FLIGHT_HEIGHT = 170; // altura del arco de vuelo, solo visual
+const WHIRLWIND_MIN_THROW = 450;     // distancia mínima/máxima a la que sale despedido
+const WHIRLWIND_MAX_THROW = 900;
+
 class SushiDashGame {
   constructor() {
     this.canvas = document.getElementById('gameCanvas');
@@ -2135,7 +2371,47 @@ class SushiDashGame {
     });
     document.getElementById('btnViewCharactersFromWin').addEventListener('click', () => this.openCharacterScreen());
 
-    document.getElementById('btnAbility').addEventListener('click', () => this.useRemoveAbility());
+    // Botón táctil de habilidad especial: equivalente en pantalla de la tecla D.
+    // Las habilidades de pulsación única (eliminar obstáculo, crear rampa) se
+    // disparan con un click normal (que ya funciona igual con touch y ratón).
+    // Las habilidades de "mantener pulsada D" (acelerar/frenar, planear,
+    // apuntar+teletransportarse) usan Pointer Events con captura de puntero,
+    // para que un dedo pueda arrastrarse fuera del botón sin perder el "held"
+    // — imprescindible para apuntar el teletransporte del Takoyaki arrastrando.
+    const abilityBtn = document.getElementById('btnAbility');
+    abilityBtn.addEventListener('click', () => {
+      if (this.abilityButtonMode === 'remove') this.useRemoveAbility();
+      else if (this.abilityButtonMode === 'ramp') this.placeRiceRamp();
+      else if (this.abilityButtonMode === 'whirlwind') this.useWhirlwind();
+    });
+    abilityBtn.addEventListener('pointerdown', (e) => {
+      const config = ABILITY_BUTTON_CONFIG[this.abilityButtonMode];
+      if (!config || !config.hold) return;
+      e.preventDefault();
+      abilityBtn.setPointerCapture(e.pointerId);
+      this.keyDHeld = true;
+      if (this.abilityButtonMode === 'teleport') this.updateAimFromClientPos(e.clientX, e.clientY);
+    });
+    abilityBtn.addEventListener('pointermove', (e) => {
+      if (this.keyDHeld && this.abilityButtonMode === 'teleport') {
+        this.updateAimFromClientPos(e.clientX, e.clientY);
+      }
+    });
+    const releaseAbilityHold = () => {
+      const config = ABILITY_BUTTON_CONFIG[this.abilityButtonMode];
+      if (!config || !config.hold) return;
+      this.keyDHeld = false;
+      if (this.abilityButtonMode === 'teleport') this.teleportTakoyaki();
+    };
+    abilityBtn.addEventListener('pointerup', releaseAbilityHold);
+    abilityBtn.addEventListener('pointercancel', releaseAbilityHold);
+    // En móvil/tablet, mantener el dedo sobre el botón abre el menú contextual
+    // o la selección de texto, que cancelan la pulsación: se bloquean.
+    abilityBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+    abilityBtn.addEventListener('touchstart', (e) => {
+      const config = ABILITY_BUTTON_CONFIG[this.abilityButtonMode];
+      if (config && config.hold) e.preventDefault();
+    }, { passive: false });
 
     document.getElementById('btnEvents').addEventListener('click', () => this.goToEvents());
     document.getElementById('btnCloseEvents').addEventListener('click', () => this.goToMenu());
@@ -2173,9 +2449,9 @@ class SushiDashGame {
       if (e.code === 'KeyA' && this.state === 'playing' && this.currentLevel) {
         this.currentLevel.scrollStopped = !this.currentLevel.scrollStopped;
       }
-      // Tecla S = habilidad del Ramen (eliminar el próximo obstáculo), equivalente
+      // Tecla D = habilidad del Ramen (eliminar el próximo obstáculo), equivalente
       // en teclado del botón 🍜 en pantalla.
-      if (e.code === 'KeyS' && this.state === 'playing' && this.currentLevel) {
+      if (e.code === 'KeyD' && this.state === 'playing' && this.currentLevel) {
         this.useRemoveAbility();
       }
       // Tecla D (pulsación única) = habilidad del Arroz con pollo teriyaki:
@@ -2183,6 +2459,10 @@ class SushiDashGame {
       // Takoyaki, no necesita mantenerse pulsada ni apuntar con el ratón.
       if (e.code === 'KeyD' && this.state === 'playing' && this.currentLevel && this.currentLevel.food.canPlaceRamp) {
         this.placeRiceRamp();
+      }
+      // Tecla D (pulsación única) = remolino de la Gyoza.
+      if (e.code === 'KeyD' && this.state === 'playing' && this.currentLevel && this.currentLevel.food.canWhirlwind) {
+        this.useWhirlwind();
       }
     });
 
@@ -2451,7 +2731,10 @@ class SushiDashGame {
       livesLeft: food.extraLives || 0,
       removeCharges: food.removeCharges || 0,
       teleportCharges: food.teleportCharges || 0,
-      rampCharges: food.rampCharges || 0
+      rampCharges: food.rampCharges || 0,
+      // Remolino (Gyoza): a diferencia del resto de cupos, NO se recarga al
+      // morir (ver resetPlayerToStart); solo al volver a montar el nivel aquí.
+      whirlwindCharges: food.whirlwindCharges || 0
     };
 
     this.player = {
@@ -2466,6 +2749,7 @@ class SushiDashGame {
     this.nextTeleportAvailableAt = 0;
     this.teleportFlashUntil = 0;
     this.launchFlashUntil = 0;
+    this.whirlwindTimeLeft = 0;
 
     document.getElementById('hudLevelName').textContent = levelDef.name;
     this.updateAttemptsHud();
@@ -2492,6 +2776,9 @@ class SushiDashGame {
     if (level.food.canPlaceRamp) {
       text += ` · Rampas: ${level.rampCharges}`;
     }
+    if (level.food.canWhirlwind) {
+      text += ` · Remolino: ${level.whirlwindCharges}`;
+    }
     document.getElementById('hudAttempts').textContent = text;
   }
 
@@ -2501,17 +2788,43 @@ class SushiDashGame {
     document.getElementById('progressFill').style.width = `${percent}%`;
   }
 
-  // Botón en pantalla de la habilidad del Ramen (equivalente táctil de la
-  // tecla S): solo visible si el personaje equipado puede eliminar
-  // obstáculos, y muestra cuántos usos le quedan en la partida actual.
+  // Botón en pantalla de la habilidad especial del personaje equipado:
+  // equivalente táctil de la tecla D para las habilidades que en teclado
+  // dependen de ella (pulsación única o mantener pulsada). Solo visible si
+  // el personaje equipado tiene alguna habilidad especial; su icono, título
+  // y modo de uso (tocar / mantener pulsado) cambian según cuál sea.
   updateAbilityButton() {
     const btn = document.getElementById('btnAbility');
+    const chargesEl = document.getElementById('abilityCharges');
     const level = this.currentLevel;
-    const canUse = !!(level && level.food.canRemoveObstacles);
-    btn.style.display = canUse ? 'flex' : 'none';
-    if (canUse) {
-      document.getElementById('abilityCharges').textContent = level.removeCharges;
-      btn.disabled = level.removeCharges <= 0;
+    const food = level ? level.food : null;
+    let mode = null;
+    if (food) {
+      if (food.canRemoveObstacles) mode = 'remove';
+      else if (food.canPlaceRamp) mode = 'ramp';
+      else if (food.canWhirlwind) mode = 'whirlwind';
+      else if (food.canTeleport) mode = 'teleport';
+      else if (food.canGlide) mode = 'glide';
+      else if (food.canAccelerate) mode = food.accelMultiplier < 1 ? 'brake' : 'accelerate';
+    }
+    this.abilityButtonMode = mode;
+    btn.style.display = mode ? 'flex' : 'none';
+    if (!mode) return;
+
+    const config = ABILITY_BUTTON_CONFIG[mode];
+    document.getElementById('abilityIcon').textContent = config.icon;
+    btn.setAttribute('aria-label', config.label);
+    btn.title = config.label;
+
+    const charges = config.chargesKey ? level[config.chargesKey] : null;
+    if (charges === null) {
+      chargesEl.textContent = '';
+      chargesEl.style.display = 'none';
+      btn.disabled = false;
+    } else {
+      chargesEl.textContent = charges;
+      chargesEl.style.display = 'flex';
+      btn.disabled = charges <= 0;
     }
   }
 
@@ -2530,7 +2843,7 @@ class SushiDashGame {
     return removed;
   }
 
-  // Habilidad del Ramen: hasta 3 veces por intento (tecla S o botón 🍜).
+  // Habilidad del Ramen: hasta 3 veces por intento (tecla D o botón 🍜).
   useRemoveAbility() {
     if (this.state !== 'playing' || !this.currentLevel) return;
     const level = this.currentLevel;
@@ -2549,6 +2862,106 @@ class SushiDashGame {
     this.audio.vibrate(40);
   }
 
+  // Habilidad de la Gyoza: se convierte en remolino durante `whirlwindDuration`
+  // segundos. Solo 1 vez, y el cupo NO se recupera al morir (solo al salir
+  // del nivel y volver a entrar, que vuelve a pasar por beginRun()).
+  useWhirlwind() {
+    if (this.state !== 'playing' || !this.currentLevel) return;
+    const level = this.currentLevel;
+    const food = level.food;
+    if (!food.canWhirlwind || level.whirlwindCharges <= 0 || this.whirlwindTimeLeft > 0) return;
+
+    level.whirlwindCharges -= 1;
+    this.whirlwindTimeLeft = food.whirlwindDuration;
+    this.updateAttemptsHud();
+    this.updateAbilityButton();
+    this.audio.whirlwind();
+    this.audio.vibrate([30, 30, 60]);
+  }
+
+  // Mientras dura el remolino, cada pincho del suelo (normal o grande) que
+  // entra en su alcance sale volando: deja de colisionar mientras vuela y,
+  // al caer, se queda en su nuevo sitio para el resto de la partida — también
+  // tras morir, porque `level.obstacles` solo se vuelve a copiar de la
+  // definición del nivel en beginRun().
+  updateWhirlwind(dt, playerWorldX) {
+    const level = this.currentLevel;
+    if (this.whirlwindTimeLeft > 0) {
+      this.whirlwindTimeLeft = Math.max(0, this.whirlwindTimeLeft - dt);
+      for (const o of level.obstacles) {
+        if ((o.type !== 'spike' && o.type !== 'bigspike') || o.flying) continue;
+        if (this.obstacleRightExtent(o) < playerWorldX || o.x > playerWorldX + WHIRLWIND_REACH) continue;
+        o.flying = { t: 0, fromX: o.x, toX: this.findWhirlwindLandingX(o, playerWorldX) };
+      }
+    }
+
+    let landed = false;
+    for (const o of level.obstacles) {
+      if (!o.flying) continue;
+      o.flying.t += dt;
+      if (o.flying.t >= WHIRLWIND_FLIGHT_TIME) {
+        this.landFlyingObstacle(o);
+        landed = true;
+      }
+    }
+    if (landed) this.settleLandedObstacles();
+  }
+
+  finishWhirlwindFlights() {
+    const level = this.currentLevel;
+    if (!level.obstacles.some(o => o.flying)) return;
+    level.obstacles.forEach(o => { if (o.flying) this.landFlyingObstacle(o); });
+    this.settleLandedObstacles();
+  }
+
+  landFlyingObstacle(o) {
+    if (o.flying.toX === null) {
+      o.removed = true; // no había sitio libre: ha salido volando del nivel
+    } else {
+      o.x = o.flying.toX;
+    }
+    delete o.flying;
+  }
+
+  // Quita los pinchos que salieron volando fuera del nivel y reordena por `x`,
+  // porque otras partes del motor (p. ej. removeNextObstacleAhead) asumen
+  // que `obstacles` está ordenado.
+  settleLandedObstacles() {
+    const level = this.currentLevel;
+    level.obstacles = level.obstacles.filter(o => !o.removed);
+    level.obstacles.sort((a, b) => a.x - b.x);
+  }
+
+  // Elige dónde cae un pincho lanzado por el remolino: entre 450 y 900px más
+  // adelante (pseudoaleatorio pero fijo según su posición original), por
+  // delante de donde estará el jugador cuando caiga y sin pisar ningún otro
+  // obstáculo. Lejos de techos/enemigos/plataformas deja más hueco, para no
+  // crear combinaciones literalmente imposibles, pero sí puede complicar el
+  // nivel (esa es la gracia). Devuelve null si no encuentra hueco.
+  findWhirlwindLandingX(o, playerWorldX) {
+    const level = this.currentLevel;
+    const width = this.obstacleRightExtent(o) - o.x;
+    const hash = Math.abs(Math.sin(o.x * 12.9898) * 43758.5453) % 1;
+    const throwDist = WHIRLWIND_MIN_THROW + hash * (WHIRLWIND_MAX_THROW - WHIRLWIND_MIN_THROW);
+    const playerAtLanding = playerWorldX + level.scrollSpeed * WHIRLWIND_FLIGHT_TIME;
+    let x = Math.max(o.x + throwDist, playerAtLanding + 260);
+
+    const spans = level.obstacles.filter(p => p !== o).map(p => {
+      const px = p.flying ? p.flying.toX : p.x;
+      if (px === null) return null;
+      const margin = (p.type === 'ceilspike' || p.type === 'enemy' || p.type === 'platform') ? 260 : 110;
+      return { start: px - margin, end: px + (this.obstacleRightExtent(p) - p.x) + margin };
+    }).filter(Boolean);
+
+    for (let tries = 0; tries < 80; tries++) {
+      if (x + width > level.goalX - 250) return null;
+      const clash = spans.find(sp => x < sp.end && x + width > sp.start);
+      if (!clash) return x;
+      x = clash.end;
+    }
+    return null;
+  }
+
   // Habilidad del Takoyaki: mantén pulsada D para apuntar (el retículo sigue
   // al ratón) y suéltala para teletransportarte hasta ese punto en vez de
   // disparar nada. Como la cámara mantiene siempre al jugador en
@@ -2559,6 +2972,16 @@ class SushiDashGame {
   // poder colisionar — no hace falta borrarlo del array ni tocar el resto
   // del motor de física/colisiones). Hasta 3 veces por intento, con un
   // pequeño margen entre usos para que se note el efecto.
+  // Traduce una posición de cliente (ratón o dedo) a coordenadas lógicas del
+  // canvas (900x380), igual que el listener `mousemove` del canvas. La usa
+  // el botón táctil de habilidad al arrastrar el dedo para apuntar el
+  // teletransporte del Takoyaki.
+  updateAimFromClientPos(clientX, clientY) {
+    const rect = document.getElementById('gameCanvas').getBoundingClientRect();
+    this.mouseX = (clientX - rect.left) / rect.width * LOGICAL_W;
+    this.mouseY = (clientY - rect.top) / rect.height * LOGICAL_H;
+  }
+
   teleportTakoyaki() {
     if (this.state !== 'playing' || !this.currentLevel) return;
     const level = this.currentLevel;
@@ -2639,6 +3062,12 @@ class SushiDashGame {
       this.player.vy = JUMP_VELOCITY * food.jumpMultiplier;
       this.player.grounded = false;
       this.player.airJumpUsed = false;
+      if (food.spinOnJump) {
+        // Fideos rápidos: una vuelta completa repartida en lo que dura el salto
+        // (subida + bajada de una parábola libre = 2·|vy| / GRAVITY).
+        this.player.spinElapsed = 0;
+        this.player.spinDuration = (2 * Math.abs(this.player.vy)) / GRAVITY;
+      }
       this.audio.jump();
     } else if (food.canDoubleJump && !this.player.airJumpUsed) {
       this.player.vy = JUMP_VELOCITY * food.jumpMultiplier;
@@ -2671,7 +3100,11 @@ class SushiDashGame {
     } else {
       this.player.vy += GRAVITY * dt;
     }
+    const prevBottom = this.player.y + PLAYER_SIZE;
     this.player.y += this.player.vy * dt;
+    if (this.player.spinElapsed != null) {
+      this.player.spinElapsed += dt;
+    }
 
     const playerWorldX = level.worldX + PLAYER_SCREEN_X;
     // En Modo Dios se ignoran huecos y plataformas como obstáculo (nada de esto debe
@@ -2682,7 +3115,11 @@ class SushiDashGame {
     let groundY;
     if (platform) {
       const surfaceY = GROUND_TOP - PLATFORM_H;
-      if (this.player.y + PLAYER_SIZE > surfaceY + 4) {
+      // Solo es un choque si ya venía por debajo de la superficie en el frame
+      // anterior. Si venía de arriba es un aterrizaje, aunque en este frame
+      // haya caído más de 4px por debajo (a 60fps cayendo rápido pasa a
+      // menudo, y antes eso contaba como choque contra el lateral).
+      if (this.player.y + PLAYER_SIZE > surfaceY + 4 && prevBottom > surfaceY + 4) {
         // todavía no ha saltado lo bastante alto: choca contra el lateral sólido de la plataforma
         this.onDeath();
         return;
@@ -2703,6 +3140,7 @@ class SushiDashGame {
       this.player.vy = 0;
       this.player.grounded = true;
       this.player.airJumpUsed = false;
+      this.player.spinElapsed = null;
     }
 
     if (this.player.y < 0) {
@@ -2726,6 +3164,7 @@ class SushiDashGame {
       }
     }
 
+    this.updateWhirlwind(dt, playerWorldX);
     this.checkObstacleCollisions(playerWorldX);
     if (food.extraLives) {
       this.updateCheckpoint(playerWorldX);
@@ -2785,6 +3224,7 @@ class SushiDashGame {
     };
 
     for (const o of level.obstacles) {
+      if (o.flying) continue; // lanzado por el remolino: no toca nada mientras vuela
       if (o.type === 'spike') {
         const box = { left: o.x, right: o.x + SPIKE_W, top: GROUND_TOP - SPIKE_H, bottom: GROUND_TOP };
         if (this.boxesOverlap(playerBox, box)) {
@@ -2896,6 +3336,12 @@ class SushiDashGame {
     level.removeCharges = level.food.removeCharges || 0;
     level.teleportCharges = level.food.teleportCharges || 0;
     level.rampCharges = level.food.rampCharges || 0;
+    // El remolino de la Gyoza es la excepción: NI se recarga su cupo NI vuelven
+    // a su sitio los pinchos que movió. Los que estaban en el aire caen ya en
+    // su destino. Todo eso solo se deshace saliendo del nivel y volviendo a
+    // entrar (Salir/Reiniciar desde la pausa), porque eso pasa por beginRun().
+    this.whirlwindTimeLeft = 0;
+    this.finishWhirlwindFlights();
     this.player.y = GROUND_TOP - PLAYER_SIZE;
     this.player.vy = 0;
     this.player.grounded = true;
@@ -2993,6 +3439,10 @@ class SushiDashGame {
     return !!(this.currentLevel && this.currentLevel.def.theme === 'rice');
   }
 
+  isSnowLevel() {
+    return !!(this.currentLevel && this.currentLevel.def.theme === 'snow');
+  }
+
   render() {
     const ctx = this.ctx;
     const isHell = this.isHellLevel();
@@ -3000,6 +3450,7 @@ class SushiDashGame {
     const isOcean = this.isOceanLevel();
     const isRamen = this.isRamenLevel();
     const isRice = this.isRiceLevel();
+    const isSnow = this.isSnowLevel();
     ctx.clearRect(0, 0, LOGICAL_W, LOGICAL_H);
 
     // cielo
@@ -3022,6 +3473,10 @@ class SushiDashGame {
     } else if (isRice) {
       skyGrad.addColorStop(0, '#fef6e4');
       skyGrad.addColorStop(1, '#ffdf9e');
+    } else if (isSnow) {
+      skyGrad.addColorStop(0, '#7f9bb8');
+      skyGrad.addColorStop(0.6, '#bcd0e2');
+      skyGrad.addColorStop(1, '#eef4fa');
     } else {
       skyGrad.addColorStop(0, '#bfe9ff');
       skyGrad.addColorStop(1, '#eaf9ff');
@@ -3129,6 +3584,22 @@ class SushiDashGame {
       }
       ctx.fillStyle = 'rgba(255,255,255,0.55)';
       ctx.fillRect(0, GROUND_TOP, LOGICAL_W, 4);
+    } else if (isSnow) {
+      // nieve: manto blanco con sombras azuladas y montoncitos redondeados
+      const snowGrad = ctx.createLinearGradient(0, GROUND_TOP, 0, LOGICAL_H);
+      snowGrad.addColorStop(0, '#ffffff');
+      snowGrad.addColorStop(1, '#cfdeec');
+      ctx.fillStyle = snowGrad;
+      ctx.fillRect(0, GROUND_TOP, LOGICAL_W, GROUND_HEIGHT);
+      ctx.fillStyle = 'rgba(150,180,215,0.35)';
+      const driftOffset = -(camOffset % 80);
+      for (let x = driftOffset; x < LOGICAL_W + 80; x += 80) {
+        ctx.beginPath();
+        ctx.ellipse(x + 40, GROUND_TOP + 30, 30, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.fillRect(0, GROUND_TOP, LOGICAL_W, 4);
     } else {
       ctx.fillStyle = '#caa06b';
       ctx.fillRect(0, GROUND_TOP, LOGICAL_W, GROUND_HEIGHT);
@@ -3146,25 +3617,20 @@ class SushiDashGame {
     // obstáculos
     const nowSec = performance.now() / 1000;
     level.obstacles.forEach(o => {
+      if (o.flying) {
+        this.drawFlyingObstacle(o, camOffset, isHell, isOcean, isRamen, isRice, isSnow);
+        return;
+      }
       const screenX = o.x - camOffset;
       if (screenX < -120 || screenX > LOGICAL_W + 120) return;
 
+      if (isSnow && o.type !== 'ramp') {
+        this.drawSnowObstacle(o, screenX, nowSec);
+        return;
+      }
+
       if (o.type === 'spike') {
-        // en el arroz, este pincho es un trozo de crunch crujiente (cebolla/ajo frito)
-        ctx.fillStyle = isHell ? '#ff5a1f' : isOcean ? '#3a2a5c' : isRamen ? '#7fbf4f' : isRice ? '#c98a3b' : '#5c9e3f';
-        ctx.beginPath();
-        ctx.moveTo(screenX, GROUND_TOP);
-        ctx.lineTo(screenX + SPIKE_W / 2, GROUND_TOP - SPIKE_H);
-        ctx.lineTo(screenX + SPIKE_W, GROUND_TOP);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = isHell ? 'rgba(255,220,120,0.6)' : isOcean ? 'rgba(150,220,255,0.5)' : isRice ? 'rgba(255,240,200,0.7)' : 'rgba(255,255,255,0.5)';
-        ctx.beginPath();
-        ctx.moveTo(screenX + SPIKE_W / 2, GROUND_TOP - SPIKE_H);
-        ctx.lineTo(screenX + SPIKE_W / 2 + 4, GROUND_TOP - SPIKE_H + 12);
-        ctx.lineTo(screenX + SPIKE_W / 2 - 4, GROUND_TOP - SPIKE_H + 12);
-        ctx.closePath();
-        ctx.fill();
+        this.drawSpike(screenX, isHell, isOcean, isRamen, isRice);
       } else if (o.type === 'bigspike') {
         this.drawBigSpike(screenX, isHell, isOcean, isRamen, isRice);
       } else if (o.type === 'gap') {
@@ -3239,6 +3705,8 @@ class SushiDashGame {
 
     if (this.currentLevel.scrollStopped) {
       this.drawStoppedBanner();
+    } else if (this.whirlwindTimeLeft > 0) {
+      this.drawWhirlwindBanner();
     } else if (this.isAccelerating) {
       this.drawAccelBanner(this.currentLevel.food.accelMultiplier < 1);
     } else if (this.isGliding) {
@@ -3271,6 +3739,10 @@ class SushiDashGame {
     }
     if (this.isRiceLevel()) {
       this.drawRiceSkyDecor(camOffset);
+      return;
+    }
+    if (this.isSnowLevel()) {
+      this.drawSnowSkyDecor(camOffset);
       return;
     }
     const ctx = this.ctx;
@@ -3811,6 +4283,219 @@ class SushiDashGame {
   // vez de sol/cocina/mar/ramen — montículos de arroz al fondo (mismo esquema
   // de parallax lento que el monte Fuji), vapor de arroz recién hecho subiendo
   // y semillas de sésamo flotando en vez de nubes/burbujas.
+  // Decorado de fondo del Nivel 15 (tema "nieve"): sol pálido tras la
+  // bruma, montañas nevadas al fondo (parallax lento), pinos nevados más
+  // cerca (parallax medio) y copos de nieve cayendo.
+  drawSnowSkyDecor(camOffset) {
+    const ctx = this.ctx;
+    const nowSec = performance.now() / 1000;
+
+    // sol pálido de invierno
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.beginPath();
+    ctx.arc(700, 70, 34, 0, Math.PI * 2);
+    ctx.fill();
+
+    // montañas nevadas al fondo
+    const mountainPeriod = 520;
+    const mountainBase = (((-camOffset * 0.04) % mountainPeriod) + mountainPeriod) % mountainPeriod;
+    for (let i = -1; i <= 2; i++) {
+      const baseX = mountainBase + i * mountainPeriod + 120;
+      const peakH = 170 + (i % 2 === 0 ? 0 : 40);
+      ctx.fillStyle = '#8fa6bf';
+      ctx.beginPath();
+      ctx.moveTo(baseX - 210, GROUND_TOP);
+      ctx.lineTo(baseX, GROUND_TOP - peakH);
+      ctx.lineTo(baseX + 210, GROUND_TOP);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#f4f8fc';
+      ctx.beginPath();
+      ctx.moveTo(baseX, GROUND_TOP - peakH);
+      ctx.lineTo(baseX - 62, GROUND_TOP - peakH + 62);
+      ctx.lineTo(baseX - 30, GROUND_TOP - peakH + 50);
+      ctx.lineTo(baseX - 6, GROUND_TOP - peakH + 68);
+      ctx.lineTo(baseX + 22, GROUND_TOP - peakH + 48);
+      ctx.lineTo(baseX + 62, GROUND_TOP - peakH + 62);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // pinos nevados, parallax medio
+    const treePeriod = 260;
+    const treeBase = (((-camOffset * 0.12) % treePeriod) + treePeriod) % treePeriod;
+    for (let i = -1; i <= 4; i++) {
+      const tx = treeBase + i * treePeriod + 60;
+      const scale = i % 2 === 0 ? 1 : 0.8;
+      ctx.fillStyle = '#6b4a2f';
+      ctx.fillRect(tx - 4 * scale, GROUND_TOP - 16 * scale, 8 * scale, 16 * scale);
+      for (let layer = 0; layer < 3; layer++) {
+        const ly = GROUND_TOP - 16 * scale - layer * 22 * scale;
+        const lw = (34 - layer * 8) * scale;
+        ctx.fillStyle = '#2f5d4a';
+        ctx.beginPath();
+        ctx.moveTo(tx - lw, ly);
+        ctx.lineTo(tx, ly - 34 * scale);
+        ctx.lineTo(tx + lw, ly);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.beginPath();
+        ctx.moveTo(tx - lw * 0.45, ly - 18 * scale);
+        ctx.lineTo(tx, ly - 34 * scale);
+        ctx.lineTo(tx + lw * 0.45, ly - 18 * scale);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    // copos de nieve cayendo (no dependen de la cámara más que un poco)
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    for (let i = 0; i < 70; i++) {
+      const fall = (nowSec * (28 + (i % 5) * 7) + i * 53) % GROUND_TOP;
+      const sway = Math.sin(nowSec * 1.3 + i) * 8;
+      const x = ((((i * 97) - camOffset * 0.3 + sway) % LOGICAL_W) + LOGICAL_W) % LOGICAL_W;
+      ctx.beginPath();
+      ctx.arc(x, fall, 1.2 + (i % 3) * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Obstáculos del tema "nieve", con las mismas dimensiones (y por tanto las
+  // mismas cajas de colisión) que los de siempre: pincho → carámbano de
+  // hielo clavado en el suelo, pincho grande → racimo de cristales de
+  // hielo, hueco → agujero de agua helada, enemigo → copo de nieve gigante
+  // con puntas, pincho de techo → carámbanos colgando, plataforma → bloque
+  // de hielo con nieve encima.
+  drawSnowObstacle(o, screenX, nowSec) {
+    const ctx = this.ctx;
+    const iceFill = '#a9d8f2';
+    const iceLight = 'rgba(235,250,255,0.85)';
+    const iceEdge = 'rgba(50,110,160,0.55)';
+    const shard = (cx, bw, bh, top = GROUND_TOP, down = false) => {
+      const tipY = down ? top + bh : top - bh;
+      ctx.fillStyle = iceFill;
+      ctx.beginPath();
+      ctx.moveTo(cx - bw / 2, top);
+      ctx.lineTo(cx, tipY);
+      ctx.lineTo(cx + bw / 2, top);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = iceEdge;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = iceLight;
+      ctx.beginPath();
+      ctx.moveTo(cx - bw / 4, top);
+      ctx.lineTo(cx, tipY);
+      ctx.lineTo(cx - bw / 12, top);
+      ctx.closePath();
+      ctx.fill();
+    };
+
+    if (o.type === 'spike') {
+      shard(screenX + SPIKE_W / 2, SPIKE_W, SPIKE_H);
+    } else if (o.type === 'bigspike') {
+      const w = BIGSPIKE_W;
+      shard(screenX + w * 0.22, w * 0.42, BIGSPIKE_H * 0.6);
+      shard(screenX + w * 0.78, w * 0.42, BIGSPIKE_H * 0.6);
+      shard(screenX + w * 0.5, w * 0.56, BIGSPIKE_H);
+    } else if (o.type === 'gap') {
+      const waterGrad = ctx.createLinearGradient(0, GROUND_TOP, 0, LOGICAL_H);
+      waterGrad.addColorStop(0, '#2a6f9c');
+      waterGrad.addColorStop(1, '#071c2c');
+      ctx.fillStyle = waterGrad;
+      ctx.fillRect(screenX, GROUND_TOP, o.width, GROUND_HEIGHT);
+      ctx.fillStyle = 'rgba(200,235,255,0.5)';
+      ctx.fillRect(screenX, GROUND_TOP + 3, o.width, 2);
+      // bordes de hielo roto
+      ctx.fillStyle = '#e8f4fb';
+      [screenX, screenX + o.width].forEach((ex, side) => {
+        const dir = side === 0 ? 1 : -1;
+        ctx.beginPath();
+        ctx.moveTo(ex, GROUND_TOP);
+        ctx.lineTo(ex + dir * 14, GROUND_TOP);
+        ctx.lineTo(ex + dir * 6, GROUND_TOP + 12);
+        ctx.lineTo(ex, GROUND_TOP + 18);
+        ctx.closePath();
+        ctx.fill();
+      });
+    } else if (o.type === 'enemy') {
+      const box = this.enemyBox(o, nowSec);
+      const cx = screenX + ENEMY_W / 2;
+      const cy = (box.top + box.bottom) / 2;
+      const r = ENEMY_CORE_RADIUS + ENEMY_SPIKE_LEN;
+      const glow = ctx.createRadialGradient(cx, cy, 2, cx, cy, r + 8);
+      glow.addColorStop(0, 'rgba(200,235,255,0.6)');
+      glow.addColorStop(1, 'rgba(200,235,255,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(nowSec * ENEMY_SPIN_SPEED + o.x * 0.03);
+      ctx.strokeStyle = '#e9f7ff';
+      ctx.lineCap = 'round';
+      for (let i = 0; i < 6; i++) {
+        ctx.rotate(Math.PI / 3);
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -r);
+        ctx.stroke();
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, -r * 0.55);
+        ctx.lineTo(-6, -r * 0.8);
+        ctx.moveTo(0, -r * 0.55);
+        ctx.lineTo(6, -r * 0.8);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#7fc4ea';
+      ctx.beginPath();
+      ctx.arc(0, 0, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    } else if (o.type === 'ceilspike') {
+      const w = CEIL_SPIKE_W;
+      shard(screenX + w * 0.18, w * 0.34, CEIL_SPIKE_DROP * 0.72, 0, true);
+      shard(screenX + w * 0.5, w * 0.4, CEIL_SPIKE_DROP, 0, true);
+      shard(screenX + w * 0.82, w * 0.34, CEIL_SPIKE_DROP * 0.78, 0, true);
+      // cornisa de nieve de la que cuelgan
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(screenX - 4, -6, w + 8, 16, 8);
+      ctx.fill();
+    } else if (o.type === 'platform') {
+      const w = PLATFORM_W;
+      const surfaceY = GROUND_TOP - PLATFORM_H;
+      const blockGrad = ctx.createLinearGradient(screenX, 0, screenX + w, 0);
+      blockGrad.addColorStop(0, '#9fd2ee');
+      blockGrad.addColorStop(1, '#cdebfa');
+      ctx.fillStyle = blockGrad;
+      ctx.fillRect(screenX, surfaceY, w, PLATFORM_H);
+      ctx.strokeStyle = iceEdge;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(screenX, surfaceY, w, PLATFORM_H);
+      // grietas del hielo
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(screenX + 20, surfaceY + 30);
+      ctx.lineTo(screenX + 44, surfaceY + 58);
+      ctx.lineTo(screenX + 36, surfaceY + 90);
+      ctx.moveTo(screenX + 96, surfaceY + 40);
+      ctx.lineTo(screenX + 80, surfaceY + 76);
+      ctx.stroke();
+      // capa de nieve encima (donde se aterriza)
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(screenX - 3, surfaceY - 4, w + 6, 14, 7);
+      ctx.fill();
+    }
+  }
+
   drawRiceSkyDecor(camOffset) {
     const ctx = this.ctx;
     const nowSec = performance.now() / 1000;
@@ -3920,6 +4605,55 @@ class SushiDashGame {
     ctx.globalAlpha = 1 - t * 0.3;
     ctx.translate(x + (PLAYER_SIZE - size) / 2, y + (PLAYER_SIZE - size) / 2);
     this.drawFoodSprite(ctx, this.currentLevel.food, size);
+    ctx.restore();
+  }
+
+  drawSpike(screenX, isHell, isOcean, isRamen, isRice) {
+    const ctx = this.ctx;
+    // en el arroz, este pincho es un trozo de crunch crujiente (cebolla/ajo frito)
+    ctx.fillStyle = isHell ? '#ff5a1f' : isOcean ? '#3a2a5c' : isRamen ? '#7fbf4f' : isRice ? '#c98a3b' : '#5c9e3f';
+    ctx.beginPath();
+    ctx.moveTo(screenX, GROUND_TOP);
+    ctx.lineTo(screenX + SPIKE_W / 2, GROUND_TOP - SPIKE_H);
+    ctx.lineTo(screenX + SPIKE_W, GROUND_TOP);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = isHell ? 'rgba(255,220,120,0.6)' : isOcean ? 'rgba(150,220,255,0.5)' : isRice ? 'rgba(255,240,200,0.7)' : 'rgba(255,255,255,0.5)';
+    ctx.beginPath();
+    ctx.moveTo(screenX + SPIKE_W / 2, GROUND_TOP - SPIKE_H);
+    ctx.lineTo(screenX + SPIKE_W / 2 + 4, GROUND_TOP - SPIKE_H + 12);
+    ctx.lineTo(screenX + SPIKE_W / 2 - 4, GROUND_TOP - SPIKE_H + 12);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Pincho lanzado por el remolino de la Gyoza: vuela en arco, dando vueltas,
+  // desde su sitio original hasta donde va a caer.
+  drawFlyingObstacle(o, camOffset, isHell, isOcean, isRamen, isRice, isSnow) {
+    const ctx = this.ctx;
+    const p = Math.min(1, o.flying.t / WHIRLWIND_FLIGHT_TIME);
+    // si no hay sitio donde caer, se va volando hacia arriba y fuera de la pantalla
+    const toX = o.flying.toX === null ? o.flying.fromX + 900 : o.flying.toX;
+    const worldX = o.flying.fromX + (toX - o.flying.fromX) * p;
+    const lift = o.flying.toX === null ? p * 520 : Math.sin(Math.PI * p) * WHIRLWIND_FLIGHT_HEIGHT;
+    const screenX = worldX - camOffset;
+    if (screenX < -150 || screenX > LOGICAL_W + 150) return;
+
+    const w = o.type === 'bigspike' ? BIGSPIKE_W : SPIKE_W;
+    const h = o.type === 'bigspike' ? BIGSPIKE_H : SPIKE_H;
+    const cx = screenX + w / 2;
+    const cy = GROUND_TOP - h / 2;
+    ctx.save();
+    ctx.translate(cx, cy - lift);
+    ctx.rotate(p * Math.PI * 4);
+    ctx.translate(-cx, -cy);
+    if (isSnow) {
+      this.drawSnowObstacle(o, screenX, 0);
+    } else if (o.type === 'bigspike') {
+      this.drawBigSpike(screenX, isHell, isOcean, isRamen, isRice);
+    } else {
+      this.drawSpike(screenX, isHell, isOcean, isRamen, isRice);
+    }
     ctx.restore();
   }
 
@@ -4351,6 +5085,59 @@ class SushiDashGame {
     ctx.restore();
   }
 
+  drawWhirlwindBanner() {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 16px Segoe UI, sans-serif';
+    const text = `🌪️ REMOLINO · ${Math.ceil(this.whirlwindTimeLeft)}s`;
+    const w = ctx.measureText(text).width + 28;
+    ctx.fillStyle = 'rgba(91, 110, 140, 0.88)';
+    ctx.beginPath();
+    ctx.roundRect(LOGICAL_W / 2 - w / 2, 14, w, 32, 16);
+    ctx.fill();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(text, LOGICAL_W / 2, 35);
+    ctx.restore();
+  }
+
+  // Forma de remolino de la Gyoza: un embudo de anillos girando alrededor
+  // del jugador, con la gyoza dando vueltas dentro. Solo visual: la caja de
+  // colisión sigue siendo el cuadrado de siempre. Parpadea en los 2 últimos
+  // segundos para avisar de que se va a acabar.
+  drawWhirlwindPlayer() {
+    const ctx = this.ctx;
+    const nowSec = performance.now() / 1000;
+    const cx = PLAYER_SCREEN_X + PLAYER_SIZE / 2;
+    const bottom = this.player.y + PLAYER_SIZE;
+    const fading = this.whirlwindTimeLeft < 2 && Math.floor(nowSec * 8) % 2 === 0;
+
+    ctx.save();
+    ctx.globalAlpha = fading ? 0.45 : 0.85;
+    const rings = 7;
+    for (let i = 0; i < rings; i++) {
+      const f = i / (rings - 1);
+      const ry = bottom - 4 - f * 62;
+      const rw = 8 + f * 34;
+      const offset = Math.sin(nowSec * 9 + i * 0.9) * (3 + f * 5);
+      ctx.strokeStyle = i % 2 === 0 ? 'rgba(210,225,240,0.95)' : 'rgba(150,170,195,0.9)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(cx + offset, ry, rw, 4 + f * 3, 0, nowSec * 6 + i, nowSec * 6 + i + Math.PI * 1.5);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // la gyoza, más pequeña, girando dentro del remolino
+    const small = PLAYER_SIZE * 0.7;
+    ctx.save();
+    ctx.translate(cx, this.player.y + PLAYER_SIZE / 2 - 6);
+    ctx.rotate(nowSec * 14);
+    ctx.translate(-small / 2, -small / 2);
+    this.drawFoodSprite(ctx, this.currentLevel.food, small);
+    ctx.restore();
+  }
+
   drawRemoveBanner() {
     const ctx = this.ctx;
     ctx.save();
@@ -4482,9 +5269,21 @@ class SushiDashGame {
 
   drawPlayer() {
     if (!this.currentLevel || !this.player) return;
+    if (this.whirlwindTimeLeft > 0) {
+      this.drawWhirlwindPlayer();
+      return;
+    }
     const ctx = this.ctx;
     ctx.save();
     ctx.translate(PLAYER_SCREEN_X, this.player.y);
+    // Giro en el aire (Fideos rápidos): puramente visual, sobre el centro del
+    // sprite; la caja de colisión sigue siendo el mismo cuadrado de siempre.
+    if (!this.player.grounded && this.player.spinElapsed != null) {
+      const t = Math.min(1, this.player.spinElapsed / this.player.spinDuration);
+      ctx.translate(PLAYER_SIZE / 2, PLAYER_SIZE / 2);
+      ctx.rotate(t * Math.PI * 2);
+      ctx.translate(-PLAYER_SIZE / 2, -PLAYER_SIZE / 2);
+    }
     this.drawFoodSprite(ctx, this.currentLevel.food, PLAYER_SIZE);
     ctx.restore();
   }
@@ -4524,6 +5323,14 @@ class SushiDashGame {
     }
     if (food.shape === 'ramen') {
       this.drawRamenSprite(ctx, food, size);
+      return;
+    }
+    if (food.shape === 'quickNoodles') {
+      this.drawQuickNoodlesSprite(ctx, food, size);
+      return;
+    }
+    if (food.shape === 'gyoza') {
+      this.drawGyozaSprite(ctx, food, size);
       return;
     }
     if (food.shape === 'teriyakiRice') {
@@ -5108,6 +5915,148 @@ class SushiDashGame {
 
     if (food.hasFace) {
       this.drawCuteFace(ctx, cx, bowlTop + size * 0.02, size, 0.55, 0.7);
+    }
+  }
+
+  // Personaje del Evento "Fideos a toda prisa": un vaso de fideos
+  // instantáneos, con la tapa de papel medio levantada, fideos rizados
+  // asomando por arriba, una franja roja con líneas de velocidad y carita.
+  drawQuickNoodlesSprite(ctx, food, size) {
+    const cx = size / 2;
+    const cupTop = size * 0.3;
+    const cupBottom = size * 0.98;
+    const cupTopW = size * 0.86;
+    const cupBottomW = size * 0.62;
+
+    // fideos rizados asomando (se dibujan antes que el vaso para quedar detrás del borde)
+    ctx.strokeStyle = food.topColor;
+    ctx.lineWidth = size * 0.045;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 4; i++) {
+      const x0 = cx - cupTopW * 0.36 + i * cupTopW * 0.22;
+      ctx.beginPath();
+      ctx.moveTo(x0, cupTop + size * 0.02);
+      ctx.bezierCurveTo(x0 - size * 0.08, cupTop - size * 0.14, x0 + size * 0.12, cupTop - size * 0.16, x0 + size * 0.06, cupTop - size * 0.02);
+      ctx.stroke();
+    }
+
+    // vaso (de papel/poliestireno, ligeramente cónico)
+    ctx.fillStyle = food.bodyColor;
+    ctx.beginPath();
+    ctx.moveTo(cx - cupTopW / 2, cupTop);
+    ctx.lineTo(cx - cupBottomW / 2, cupBottom);
+    ctx.lineTo(cx + cupBottomW / 2, cupBottom);
+    ctx.lineTo(cx + cupTopW / 2, cupTop);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // franja roja con líneas de velocidad blancas
+    const bandTop = cupTop + (cupBottom - cupTop) * 0.52;
+    const bandBottom = cupTop + (cupBottom - cupTop) * 0.8;
+    const widthAt = (y) => cupTopW + (cupBottomW - cupTopW) * ((y - cupTop) / (cupBottom - cupTop));
+    ctx.fillStyle = '#E84A3C';
+    ctx.beginPath();
+    ctx.moveTo(cx - widthAt(bandTop) / 2, bandTop);
+    ctx.lineTo(cx - widthAt(bandBottom) / 2, bandBottom);
+    ctx.lineTo(cx + widthAt(bandBottom) / 2, bandBottom);
+    ctx.lineTo(cx + widthAt(bandTop) / 2, bandTop);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = size * 0.025;
+    [0.35, 0.65].forEach((f) => {
+      const y = bandTop + (bandBottom - bandTop) * f;
+      ctx.beginPath();
+      ctx.moveTo(cx - widthAt(y) * 0.32, y);
+      ctx.lineTo(cx + widthAt(y) * 0.2, y);
+      ctx.stroke();
+    });
+
+    // aro del borde superior
+    ctx.fillStyle = '#EDE6D6';
+    ctx.beginPath();
+    ctx.roundRect(cx - cupTopW / 2 - size * 0.02, cupTop - size * 0.03, cupTopW + size * 0.04, size * 0.07, size * 0.03);
+    ctx.fill();
+
+    // tapa de papel medio levantada (doblada hacia atrás por la derecha)
+    ctx.save();
+    ctx.translate(cx + cupTopW * 0.1, cupTop - size * 0.02);
+    ctx.rotate(-0.55);
+    ctx.fillStyle = '#F5D77A';
+    ctx.beginPath();
+    ctx.roundRect(0, -size * 0.05, size * 0.4, size * 0.07, size * 0.02);
+    ctx.fill();
+    ctx.fillStyle = '#E84A3C';
+    ctx.beginPath();
+    ctx.arc(size * 0.22, -size * 0.015, size * 0.022, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    if (food.hasFace) {
+      this.drawCuteFace(ctx, cx, cupTop + (bandTop - cupTop) * 0.45, size, 0.6, 0.75);
+    }
+  }
+
+  // Personaje del Nivel 15: una gyoza (empanadilla japonesa) en forma de media
+  // luna, con los pliegues del cierre arriba, la base tostada y carita.
+  drawGyozaSprite(ctx, food, size) {
+    const cx = size / 2;
+    const baseY = size * 0.86;
+    const halfW = size * 0.48;
+    const ctrlY = size * 0.02; // puntos de control de la curva: la cima queda a ~0.23·size
+
+    // cuerpo en media luna
+    ctx.fillStyle = food.bodyColor;
+    ctx.beginPath();
+    ctx.moveTo(cx - halfW, baseY);
+    ctx.bezierCurveTo(cx - halfW, ctrlY, cx + halfW, ctrlY, cx + halfW, baseY);
+    ctx.quadraticCurveTo(cx, baseY + size * 0.08, cx - halfW, baseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(120,80,40,0.25)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // base tostada a la plancha
+    ctx.save();
+    ctx.clip();
+    ctx.fillStyle = food.topColor;
+    ctx.beginPath();
+    ctx.ellipse(cx, baseY + size * 0.02, halfW, size * 0.09, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(120,60,20,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(cx, baseY + size * 0.05, halfW * 0.8, size * 0.05, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // pliegues del cierre, a lo largo del borde superior
+    ctx.strokeStyle = 'rgba(170,130,80,0.6)';
+    ctx.lineWidth = size * 0.025;
+    ctx.lineCap = 'round';
+    // (puntos sobre la propia curva de Bézier del borde, un poco hacia dentro)
+    for (let i = 0; i < 5; i++) {
+      const t = 0.22 + i * 0.14;
+      const mt = 1 - t;
+      const px = mt * mt * mt * (cx - halfW) + 3 * mt * mt * t * (cx - halfW) + 3 * mt * t * t * (cx + halfW) + t * t * t * (cx + halfW);
+      const py = mt * mt * mt * baseY + 3 * mt * mt * t * ctrlY + 3 * mt * t * t * ctrlY + t * t * t * baseY + size * 0.03;
+      ctx.beginPath();
+      ctx.moveTo(px - size * 0.03, py);
+      ctx.quadraticCurveTo(px + size * 0.03, py + size * 0.05, px - size * 0.01, py + size * 0.11);
+      ctx.stroke();
+    }
+
+    // brillo
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.beginPath();
+    ctx.ellipse(cx - halfW * 0.5, baseY - size * 0.28, size * 0.06, size * 0.1, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (food.hasFace) {
+      this.drawCuteFace(ctx, cx, baseY - size * 0.24, size, 0.7, 0.85);
     }
   }
 
