@@ -35,6 +35,12 @@ const projects = [
     enlace: "sushi/index.html",
     enable: true
   },
+  {
+    nombre: "Fire Land",
+    imagen: "img/projects/fire-land.svg",
+    enlace: "fire-land/index.html",
+    enable: true
+  },
   // {
   //   nombre: "Juego Espacial",
   //   imagen: "img/projects/space.gif",

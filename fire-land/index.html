@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fire Land</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="screen-menu" class="screen active">
+  <div class="card menu-card">
+    <h1 class="title" id="gameTitle">FIRE LAND</h1>
+    <p class="subtitle">Eres una pistola de fuego. Muévete arriba y abajo, quema robots y desbloquea una mejora nueva en cada nivel.</p>
+
+    <div id="levelList" class="level-list"></div>
+
+    <div class="menu-buttons">
+      <button id="btnInstructions" class="btn btn-secondary">Instrucciones</button>
+      <button id="btnSettings" class="btn btn-secondary">Ajustes</button>
+      <button id="btnMute" class="btn btn-secondary">Sonido: ON</button>
+    </div>
+
+    <p class="wip-note">20 niveles, 20 mejoras. Tu progreso se guarda en este navegador.</p>
+  </div>
+</div>
+
+<div id="screen-game" class="screen">
+  <div class="progress-track">
+    <div id="progressFill" class="progress-fill"></div>
+  </div>
+  <div class="game-hud">
+    <div class="hud-left">
+      <span id="hudLevelName">Nivel 1</span>
+      <span id="hudHearts">❤❤❤❤❤</span>
+    </div>
+    <div class="hud-right">
+      <span id="hudScore">0 pts</span>
+      <button id="btnPause" class="btn btn-icon" aria-label="Pausa">⏸</button>
+      <button id="btnMenuFromGame" class="btn btn-icon" aria-label="Menú">✕</button>
+    </div>
+  </div>
+  <div class="canvas-wrap">
+    <canvas id="gameCanvas" width="900" height="506"></canvas>
+    <div id="flashOverlay" class="flash-overlay"></div>
+    <div id="abilityToast" class="ability-toast"></div>
+    <div id="touchMove" class="touch-only">
+      <button id="touchUp" class="touch-arrow" type="button" aria-label="Subir">▲</button>
+      <button id="touchDown" class="touch-arrow" type="button" aria-label="Bajar">▼</button>
+    </div>
+    <button id="touchFire" class="touch-only" type="button" aria-label="Disparar fuego">🔥</button>
+  </div>
+  <p class="touch-hint">Mantén ▲ ▼ para subir y bajar · mantén 🔥 para disparar</p>
+</div>
+
+<div id="screen-pause" class="screen overlay-screen">
+  <div class="card">
+    <h2>PAUSA</h2>
+    <div class="stack-buttons">
+      <button id="btnResume" class="btn btn-primary">Reanudar</button>
+      <button id="btnRestartLevel" class="btn btn-secondary">Reiniciar nivel</button>
+      <button id="btnPauseInstructions" class="btn btn-secondary">Instrucciones</button>
+      <button id="btnPauseMenu" class="btn btn-secondary">Menú</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-levelcomplete" class="screen overlay-screen">
+  <div class="card">
+    <h2>¡Nivel superado!</h2>
+    <p id="lcScore" class="lc-stat"></p>
+    <p id="lcTime" class="lc-stat"></p>
+    <p id="lcRecord" class="lc-record" style="display:none;">🔥 ¡Nuevo récord!</p>
+    <div id="lcUnlock" class="lc-unlock" style="display:none;">
+      <p class="lc-unlock-label">¡Mejora desbloqueada!</p>
+      <p id="lcUnlockName" class="lc-unlock-name"></p>
+      <p id="lcUnlockDesc" class="lc-unlock-desc"></p>
+    </div>
+    <div class="stack-buttons">
+      <button id="btnRetryLevel" class="btn btn-secondary">Repetir nivel</button>
+      <button id="btnNextOrMenu" class="btn btn-primary">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-gameover" class="screen overlay-screen">
+  <div class="card">
+    <h2 id="goTitle">Te han fundido</h2>
+    <p id="goInfo" class="lc-stat"></p>
+    <div class="stack-buttons">
+      <button id="btnRetryFromOver" class="btn btn-primary">Reintentar nivel</button>
+      <button id="btnOverMenu" class="btn btn-secondary">Menú</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-victory" class="screen overlay-screen">
+  <div class="card">
+    <h2>🔥 FIRE LAND completado 🔥</h2>
+    <p class="lc-stat">Has superado los 20 niveles y reunido las 20 mejoras.</p>
+    <p id="vicScore" class="lc-stat"></p>
+    <div class="stack-buttons">
+      <button id="btnVictoryMenu" class="btn btn-primary">Volver al menú</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-settings" class="screen overlay-screen">
+  <div class="card">
+    <h2>Ajustes</h2>
+    <label class="setting-row">
+      <span>Volumen</span>
+      <input type="range" id="volumeRange" min="0" max="100" value="60">
+    </label>
+    <div class="stack-buttons">
+      <button id="btnToggleSound" class="btn btn-secondary">Sonido: ON</button>
+      <button id="btnToggleHaptic" class="btn btn-secondary">Vibración: ON</button>
+      <button id="btnCloseSettings" class="btn btn-primary">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-instructions" class="screen overlay-screen">
+  <div class="card">
+    <h2>Instrucciones</h2>
+    <ol class="instructions-list">
+      <li>Eres una <strong>pistola de fuego</strong> anclada a la izquierda. Solo te mueves en vertical: usa las <strong>flechas ↑ ↓</strong>, <strong>W / S</strong> o la <strong>rueda del ratón</strong>.</li>
+      <li><strong>En móvil / táctil:</strong> mantén pulsados los botones <strong>▲</strong> y <strong>▼</strong> para subir y bajar la pistola y mantén pulsado el botón <strong>🔥</strong> para disparar (puedes usar los dos dedos a la vez). También puedes tocar directamente sobre el campo para moverte y disparar con una mano. Juega con el móvil en horizontal.</li>
+      <li>Con teclado/ratón: pulsa <strong>Espacio</strong>, haz clic o toca para lanzar fuego. Manteniendo pulsado disparas en ráfaga.</li>
+      <li>Los enemigos son <strong>robots</strong>: unos caminan por la tierra y otros vuelan. Todos avanzan hacia la izquierda, donde está tu <strong>cuartel general</strong> (el muro del borde).</li>
+      <li>⚠️ Si un robot llega a tu cuartel general, <strong>pierdes la partida al instante</strong>, te queden las vidas que te queden. ¡No dejes pasar a ninguno!</li>
+      <li>Si un robot choca <strong>contigo</strong> (te has puesto en su camino), solo pierdes <strong>una vida</strong> y el robot se destruye. Es tu último recurso. Algunos voladores además te disparan.</li>
+      <li>Cada nivel tiene una cuota de robots que destruir. La barra de arriba muestra tu avance.</li>
+      <li>Al superar un nivel <strong>ganas una mejora nueva</strong> que conservas el resto de la partida: dobles disparos, rayo, perforación, escudo, dron, meteoros, orbe de brasas, lanzallamas, torreta… hasta <strong>50 niveles y 50 mejoras</strong>.</li>
+      <li>Si pierdes todas las vidas, repites el nivel (tu progreso de niveles se mantiene).</li>
+      <li>Truco: toca el título del menú 5 veces para desbloquear todos los niveles.</li>
+    </ol>
+    <button id="btnCloseInstructions" class="btn btn-primary">Entendido</button>
+  </div>
+</div>
+
+<div id="rotateHint">
+  <div style="font-size:2.4rem">📱↻</div>
+  <p>Gira el móvil en horizontal para jugar a Fire Land.</p>
+</div>
+
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
