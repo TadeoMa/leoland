@@ -54,3 +54,38 @@ window.addEventListener('keyup', e => {
     keys[e.code] = false; 
     e.preventDefault(); 
 });
+
+// ==========================================
+// CONTROLES TÁCTILES (móvil, tablet y ordenador táctil)
+// ==========================================
+// Cada botón en pantalla equivale a mantener pulsada su tecla.
+
+const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
+if (isTouchDevice) document.body.classList.add('touch');
+
+function bindTouchKey(btn) {
+    const code = btn.dataset.key;
+    const press = e => {
+        e.preventDefault();
+        keys[code] = true;
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+    };
+    const release = e => {
+        e.preventDefault();
+        keys[code] = false;
+    };
+    btn.addEventListener('pointerdown', press);
+    btn.addEventListener('pointerup', release);
+    btn.addEventListener('pointercancel', release);
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+}
+document.querySelectorAll('.touch-btn').forEach(bindTouchKey);
+
+// Los botones solo se ven mientras se está jugando un nivel.
+(function syncTouchControls() {
+    document.body.classList.toggle('playing', gameState === 'playing');
+    if (gameState !== 'playing') {
+        document.querySelectorAll('.touch-btn').forEach(b => { keys[b.dataset.key] = false; });
+    }
+    requestAnimationFrame(syncTouchControls);
+})();

@@ -150,6 +150,48 @@
             font-family: inherit;
         }
         #levelSelectBack:hover { background: #777; }
+
+        /* ===== Pantallas pequeñas: el juego se encoge para caber ===== */
+        #hudRow { max-width: 100vw; }
+        #hud { max-width: 100vw; font-size: clamp(8px, 2vw, 14px); }
+        canvas {
+            width: min(800px, 100vw, calc((100vh - 40px) * 800 / 480));
+            height: auto;
+        }
+
+        /* ===== Controles táctiles ===== */
+        .touch-controls { display: none; }
+        body.touch.playing .touch-controls {
+            display: flex;
+            position: fixed;
+            bottom: 16px;
+            gap: 14px;
+            z-index: 20;
+        }
+        .touch-left { left: 16px; }
+        .touch-right { right: 16px; }
+        .touch-btn {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            background: rgba(76, 175, 80, 0.45);
+            color: #fff;
+            font-size: 30px;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .touch-btn:active { transform: scale(0.92); background: rgba(76, 175, 80, 0.75); }
+        .touch-btn.tongue { background: rgba(233, 30, 99, 0.45); }
+        .touch-btn.tongue:active { background: rgba(233, 30, 99, 0.75); }
     </style>
 </head>
 <body>
@@ -163,6 +205,16 @@
         <button id="debugAddLifeBtn" type="button">+1 ❤️</button>
     </div>
     <canvas id="gameCanvas" width="800" height="480"></canvas>
+
+    <!-- Controles táctiles: solo aparecen en pantallas táctiles mientras juegas -->
+    <div class="touch-controls touch-left">
+        <button class="touch-btn" type="button" data-key="ArrowLeft" aria-label="Izquierda">◀</button>
+        <button class="touch-btn" type="button" data-key="ArrowRight" aria-label="Derecha">▶</button>
+    </div>
+    <div class="touch-controls touch-right">
+        <button class="touch-btn tongue" type="button" data-key="Space" aria-label="Lengua">👅</button>
+        <button class="touch-btn" type="button" data-key="ArrowUp" aria-label="Saltar">▲</button>
+    </div>
 
     <div id="startScreen">
         <h1>🦖 DINO AVENTURA</h1>
